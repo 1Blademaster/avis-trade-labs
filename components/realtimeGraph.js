@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from 'chart.js'
 import 'chartjs-adapter-moment'
+import Annotation from 'chartjs-plugin-annotation'
 import { forwardRef, useEffect, useState } from 'react'
 import { Scatter } from 'react-chartjs-2'
 ChartJS.register(
@@ -20,7 +21,8 @@ ChartJS.register(
   PointElement,
   LineElement,
   Tooltip,
-  ChartStreaming
+  ChartStreaming,
+  Annotation
 )
 
 ChartJS.defaults.color = '#fafafa'
@@ -42,21 +44,17 @@ const options = {
       frameRate: 30,
     },
     annotation: {
-      annotations: {
-        line: {
-          drawTime: 'afterDatasetsDraw',
-          type: 'line',
-          scaleID: 'y',
-          value: 430,
-          borderColor: 'black',
-          borderWidth: 5,
-          label: {
-            backgroundColor: 'red',
-            content: 'Test Label',
-            enabled: true,
-          },
-        },
-      },
+      annotations: [
+        // {
+        //   drawTime: 'afterDatasetsDraw',
+        //   type: 'line',
+        //   scaleID: 'y',
+        //   value: 430,
+        //   borderColor: 'green',
+        //   borderWidth: 3,
+        //   display: false,
+        // },
+      ],
     },
   },
   scales: {

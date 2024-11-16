@@ -1,11 +1,11 @@
 import RealtimeGraph from '@/components/realtimeGraph'
 import { Button, ButtonGroup, NumberInput, ScrollArea } from '@mantine/core'
 import { useInterval, useListState } from '@mantine/hooks'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
-function BuyTransactionRow({ key, transaction }) {
+function BuyTransactionRow({ transaction }) {
   return (
-    <div key={key} className='flex space-x-2 bg-green-300/50'>
+    <div className='flex space-x-2 bg-green-300/50'>
       <p>{new Date(transaction.time).toLocaleString()}</p>
       <p>BUY</p>
       <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
@@ -14,9 +14,9 @@ function BuyTransactionRow({ key, transaction }) {
   )
 }
 
-function SellTransactionRow({ key, transaction }) {
+function SellTransactionRow({ transaction }) {
   return (
-    <div key={key} className='flex space-x-2 bg-red-300/50'>
+    <div className='flex space-x-2 bg-red-300/50'>
       <p>{new Date(transaction.time).toLocaleString()}</p>
       <p>SELL</p>
       <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
@@ -60,27 +60,32 @@ export default function Home() {
   function buyIn() {
     if (currentBtcData === null) return
 
+    const currentBtcClose = currentBtcData.close
+
     const transaction = {
+      id: crypto.randomUUID(),
       type: 'buy',
-      btcPrice: currentBtcData.close,
+      btcPrice: currentBtcClose,
       buyPrice: buyPrice,
       time: new Date(),
     }
 
-    console.log(transaction)
+    // console.log(transaction)
 
     transactionHistoryHandler.prepend(transaction)
 
-    const annotation = {
+    const line = {
+      drawTime: 'afterDatasetsDraw',
       type: 'line',
-      mode: 'horizontal',
       scaleID: 'y',
-      value: buyPrice,
-      borderColor: 'rgb(75, 192, 192)',
+      value: currentBtcClose,
+      borderColor: '#a3e635',
       borderWidth: 2,
     }
 
-    // ref?.current.options.plugins.annotation.annotations = {buyLine: annotation}
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
 
     setBoughtIn(true)
     setCurrentBal(currentBal - buyPrice)
@@ -93,7 +98,7 @@ export default function Home() {
     const lastTransaction = transactionHistory[0]
 
     const currentBtcClose = currentBtcData.close
-    const profit =
+    var profit =
       (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
     if (currentBtcClose === lastTransaction.btcPrice) {
@@ -101,6 +106,7 @@ export default function Home() {
     }
 
     const transaction = {
+      id: crypto.randomUUID(),
       type: 'sell',
       btcPrice: currentBtcClose,
       buyPrice: lastTransaction.buyPrice,
@@ -108,11 +114,24 @@ export default function Home() {
       time: new Date(),
     }
 
-    console.log(transaction)
+    // console.log(transaction)
+
+    const line = {
+      drawTime: 'afterDatasetsDraw',
+      type: 'line',
+      scaleID: 'y',
+      value: currentBtcClose,
+      borderColor: '#f87171',
+      borderWidth: 2,
+    }
 
     transactionHistoryHandler.prepend(transaction)
 
-    // ref?.current.options.plugins.annotation.annotations = {}
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
+
+    // console.log(ref?.current.config.options.plugins.annotation.annotations)
 
     setBoughtIn(false)
     setCurrentBal(currentBal + profit)
@@ -163,17 +182,15 @@ export default function Home() {
               {transactionHistory.map((transaction) => {
                 if (transaction.type === 'buy') {
                   return (
-                    <BuyTransactionRow
-                      key={transaction.time}
-                      transaction={transaction}
-                    />
+                    <Fragment key={transaction.id}>
+                      <BuyTransactionRow transaction={transaction} />
+                    </Fragment>
                   )
                 } else {
                   return (
-                    <SellTransactionRow
-                      key={transaction.time}
-                      transaction={transaction}
-                    />
+                    <Fragment key={transaction.id}>
+                      <SellTransactionRow transaction={transaction} />
+                    </Fragment>
                   )
                 }
               })}
