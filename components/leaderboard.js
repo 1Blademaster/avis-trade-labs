@@ -2,9 +2,9 @@ import { Table } from '@mantine/core'
 
 const users = [
   { id: 1, username: 'Kush', totalProfit: 143663 },
-  { id: 1, username: 'Julian', totalProfit: 32165 },
-  { id: 1, username: 'Dan', totalProfit: 96 },
-  { id: 1, username: 'Joe', totalProfit: -4132 },
+  { id: 2, username: 'Julian', totalProfit: 32165 },
+  { id: 3, username: 'Dan', totalProfit: 96 },
+  { id: 4, username: 'Joe', totalProfit: -4132 },
 ]
 
 export default function Leaderboard() {
