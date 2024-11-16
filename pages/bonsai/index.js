@@ -10,24 +10,26 @@ export default function Bonsai() {
   const startingPoint = [centerX, height];
 
   const points = [
-    [0, -1, 0, true],
-    [45, 0, 1, false],
-    [-45, 0, 1, false],
-    [-45, 2, 2, false],
-    [45, 2, 2, false],
+    [0, -1, true, "s"],
+    [-45, "s", false, "s1"],
+    [45, "s", false, "s2"],
+    [-45, "s1", false, "2r1"],
+    [45, "s1", false, "2r2"],
+    [0, "2r1", false, "2r3"],
   ];
 
-  let references = [];
+  let references = {};
 
   useEffect(() => {
     const canvas = document.getElementById("bonsai-canvas");
     const ctx = canvas.getContext("2d");
 
     points.forEach((point) => {
+      console.log(references);
       let passedAngle = point[0];
       let referencePoint = point[1];
-      let row = point[2];
-      let highlighted = point[3];
+      let highlighted = point[2];
+      let label = point[3];
 
       let angle = passedAngle + 90;
       let xDiff = Math.cos((angle * Math.PI) / 180) * lineLength;
@@ -50,7 +52,7 @@ export default function Bonsai() {
       let xEnd = xStart - xDiff;
       let yEnd = yStart - yDiff - gap;
 
-      references.push([xEnd, yEnd]);
+      references[label] = [xEnd, yEnd];
 
       ctx.beginPath();
       ctx.moveTo(xStart, yStart);
