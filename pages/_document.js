@@ -1,4 +1,5 @@
 import Navbar from '@/components/navbar'
+import { UserProvider } from '@auth0/nextjs-auth0/client'
 import { ColorSchemeScript } from '@mantine/core'
 import { Head, Html, Main, NextScript } from 'next/document'
 
@@ -9,9 +10,8 @@ export default function Document() {
         <ColorSchemeScript defaultColorScheme='auto' />
       </Head>
       <body>
-        <Navbar />
-        <Main className='h-full' />
-        <NextScript />
+          <Main className='h-full' />
+          <NextScript />
       </body>
     </Html>
   )
