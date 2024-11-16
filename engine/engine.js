@@ -31,6 +31,6 @@ export var btcClose = 0
 
 setInterval(() => {
   current = current + 1
-  btcClose = data[current].Close
+  btcClose = data[current]?.Close
   console.log(data.length, current, data[current], btcClose)
 }, 1000)
