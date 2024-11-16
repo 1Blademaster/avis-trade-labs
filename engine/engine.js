@@ -2,7 +2,7 @@ const fs = require('fs')
 const csv = require('fast-csv')
 
 const varianceMultiplier = 1000
-const valueOffset = -430000
+const valueOffset = -427500
 
 const data = []
 
