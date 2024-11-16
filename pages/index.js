@@ -98,12 +98,20 @@ export default function Home() {
     const lastTransaction = transactionHistory[0]
 
     const currentBtcClose = currentBtcData.close
-    var profit =
-      (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
-    if (currentBtcClose === lastTransaction.btcPrice) {
-      profit = lastTransaction.buyPrice
-    }
+    // 550+(((432.61-433.82)*450)+450)
+
+    // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
+
+    const newBal =
+      currentBal +
+      ((currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice +
+        lastTransaction.buyPrice)
+
+    const profit = newBal - currentBal
+
+    console.log(newBal, profit)
+    // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
     const transaction = {
       id: crypto.randomUUID(),
@@ -134,7 +142,7 @@ export default function Home() {
     // console.log(ref?.current.config.options.plugins.annotation.annotations)
 
     setBoughtIn(false)
-    setCurrentBal(currentBal + profit)
+    setCurrentBal(newBal)
   }
 
   return (
