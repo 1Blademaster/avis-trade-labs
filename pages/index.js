@@ -175,7 +175,7 @@ export default function Home() {
                   color='red'
                   className='w-full'
                   onClick={sellOut}
-                  disabled={currentBal === 0 || !boughtIn}
+                  disabled={!boughtIn}
                 >
                   SELL
                 </Button>
