@@ -18,7 +18,7 @@ function loopThroughFiles(currentFileIndex) {
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
-      data.push(row)
+      data.push({ Close: row.Close, Timestamp: row.Timestamp })
     })
     .on('end', (rowCount) => {
       console.log(`Parsed ${rowCount} rows`)
@@ -33,7 +33,6 @@ function loopThroughFiles(currentFileIndex) {
 global.current = 0
 
 export var btcData = {
-  open: 0,
   close: 0,
   time: null,
 }
@@ -42,8 +41,9 @@ if (global.current === 0) {
   loopThroughFiles(0)
   setInterval(() => {
     current = current + 1
-    btcData.open = parseFloat(data[current]?.Open)
-    btcData.close = parseFloat(data[current]?.Close * varianceMultiplier + valueOffset)
+    btcData.close = parseFloat(
+      data[current]?.Close * varianceMultiplier + valueOffset
+    )
     btcData.time = parseInt(data[current]?.Timestamp)
     console.log(current, data.length)
   }, 100)
