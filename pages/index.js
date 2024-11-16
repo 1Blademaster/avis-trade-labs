@@ -1,5 +1,12 @@
+import Leaderboard from '@/components/leaderboard'
 import RealtimeGraph from '@/components/realtimeGraph'
-import { Button, ButtonGroup, NumberInput, ScrollArea } from '@mantine/core'
+import {
+  Button,
+  ButtonGroup,
+  Divider,
+  NumberInput,
+  ScrollArea,
+} from '@mantine/core'
 import { useInterval, useListState } from '@mantine/hooks'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
@@ -104,10 +111,12 @@ export default function Home() {
     // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
 
     const newBal =
-      currentBal + (currentBtcClose * (lastTransaction.buyPrice/lastTransaction.btcPrice))
+      currentBal +
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice)
 
-    const profit = 
-      ((currentBtcClose) * (lastTransaction.buyPrice/lastTransaction.btcPrice)) - lastTransaction.buyPrice
+    const profit =
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice) -
+      lastTransaction.buyPrice
 
     // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
@@ -145,8 +154,8 @@ export default function Home() {
 
   return (
     <div className='h-full flex p-4'>
-      <div className='flex flex-row w-full'>
-        <div className='flex flex-col w-2/3'>
+      <div className='flex flex-row w-full space-x-4'>
+        <div className='flex flex-col'>
           <div className='h-3/4'>
             <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
           </div>
@@ -202,6 +211,10 @@ export default function Home() {
               })}
             </ScrollArea>
           </div>
+        </div>
+        <Divider orientation='vertical' color='darkgray' />
+        <div className='w-1/3'>
+          <Leaderboard />
         </div>
       </div>
     </div>
