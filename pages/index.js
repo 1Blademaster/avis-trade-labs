@@ -10,6 +10,7 @@ import {
 import { useInterval, useListState } from '@mantine/hooks'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
+
 function BuyTransactionRow({ transaction }) {
   return (
     <div className='flex space-x-2 bg-green-300/50'>
@@ -41,6 +42,8 @@ export default function Home() {
   const [buyPrice, setBuyPrice] = useState(100)
   const [currentBal, setCurrentBal] = useState(1000)
   const [boughtIn, setBoughtIn] = useState(false)
+  const [stopLoss, setStopLoss] = useState(20)
+  const [takeProfit, setTakeProfit] = useState(20)
 
   const [transactionHistory, transactionHistoryHandler] = useListState([])
 
@@ -55,6 +58,14 @@ export default function Home() {
       const data = { x: Date.now(), y: btcData.close }
       ref?.current.data.datasets[0].data.push(data)
       ref?.current.update('quiet')
+
+      const lastTransaction = transactionHistory[0]
+      if (boughtIn && ((stopLoss)/100) <= (lastTransaction.btcPrice-currentBtcData.close)/lastTransaction.btcPrice){
+        sellOut()
+      }
+      else if (boughtIn && ((stopLoss)/100) <= -(lastTransaction.btcPrice-currentBtcData.close)/lastTransaction.btcPrice){
+        sellOut()
+      }
     }
     fetchPosts()
   }, 100)
@@ -77,8 +88,6 @@ export default function Home() {
       time: new Date(),
     }
 
-    // console.log(transaction)
-
     transactionHistoryHandler.prepend(transaction)
 
     const line = {
@@ -100,7 +109,7 @@ export default function Home() {
   }
 
   function sellOut() {
-    if (currentBal === 0 || !boughtIn) return
+    if (!boughtIn) return
 
     const lastTransaction = transactionHistory[0]
 
@@ -189,6 +198,20 @@ export default function Home() {
                   SELL
                 </Button>
               </ButtonGroup>
+              <NumberInput 
+                suffix='%'
+                value={stopLoss}
+                onChange={setStopLoss}
+                allowNegative={false}
+                hideControls
+              />
+              <NumberInput 
+                suffix='%'
+                value={takeProfit}
+                onChange={setTakeProfit}
+                allowNegative={false}
+                hideControls
+              />
             </div>
             <p className='font-bold text-3xl'>
               Balance: ${currentBal.toFixed(2)}
