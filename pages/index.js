@@ -104,13 +104,11 @@ export default function Home() {
     // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
 
     const newBal =
-      currentBal +
-      ((currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice +
-        lastTransaction.buyPrice)
+      currentBal + (currentBtcClose * (lastTransaction.buyPrice/lastTransaction.btcPrice))
 
-    const profit = newBal - currentBal
+    const profit = 
+      ((currentBtcClose) * (lastTransaction.buyPrice/lastTransaction.btcPrice)) - lastTransaction.buyPrice
 
-    console.log(newBal, profit)
     // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
     const transaction = {

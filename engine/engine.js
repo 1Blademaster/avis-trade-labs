@@ -1,6 +1,9 @@
 const fs = require('fs')
 const csv = require('fast-csv')
 
+const varianceMultiplier = 1000
+const valueOffset = -430000
+
 const data = []
 
 const fileNames = [
@@ -36,7 +39,7 @@ if (global.current === 0) {
   setInterval(() => {
     current = current + 1
     btcData.open = parseFloat(data[current]?.Open)
-    btcData.close = parseFloat(data[current]?.Close)
+    btcData.close = parseFloat(data[current]?.Close * varianceMultiplier + valueOffset)
     btcData.time = parseInt(data[current]?.Timestamp)
     console.log(current)
   }, 100)
