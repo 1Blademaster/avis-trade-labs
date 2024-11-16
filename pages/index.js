@@ -1,50 +1,250 @@
 import RealtimeGraph from '@/components/realtimeGraph'
-import { useInterval } from '@mantine/hooks'
-import { useEffect, useRef, useState } from 'react'
+import { Button, ButtonGroup, NumberInput, ScrollArea, Modal, Stack } from '@mantine/core'
+import { useInterval, useListState, useDisclosure } from '@mantine/hooks'
+
+import Link from 'next/link'
+
+import { useUser } from '@auth0/nextjs-auth0/client'
+
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { fetchLeaderboardScores } from './lib/data'
+
+function BuyTransactionRow({ transaction }) {
+  return (
+    <div className='flex space-x-2 bg-green-300/50'>
+      <p>{new Date(transaction.time).toLocaleString()}</p>
+      <p>BUY</p>
+      <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
+      <p>Amount: ${transaction.buyPrice.toFixed(2)}</p>
+    </div>
+  )
+}
+
+function SellTransactionRow({ transaction }) {
+  return (
+    <div className='flex space-x-2 bg-red-300/50'>
+      <p>{new Date(transaction.time).toLocaleString()}</p>
+      <p>SELL</p>
+      <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
+      <p>Amount: ${transaction.buyPrice.toFixed(2)}</p>
+      <p>Profit: ${transaction.profit.toFixed(2)}</p>
+    </div>
+  )
+}
 
 export default function Home() {
   const ref = useRef(null)
-  const [t, setT] = useState(0)
 
+  const [currentBtcData, setCurrentBtcData] = useState(null)
+
+  const [buyPrice, setBuyPrice] = useState(100)
+  const [currentBal, setCurrentBal] = useState(1000)
+  const [boughtIn, setBoughtIn] = useState(false)
+  
+  const REQUIRE_LOGIN = true; // false for dev
+
+  const {user, error, isLoading } = useUser();
+  console.log(user);
+  const [opened, {open, close}] = useDisclosure(REQUIRE_LOGIN && !user);
+  
+  const [transactionHistory, transactionHistoryHandler] = useListState([])
+  
   const interval = useInterval(() => {
-    async function fetchPosts() {
-      let res = await fetch('/api/hello')
-      let returnedData = await res.json()
-      const data = { x: Date.now(), y: t }
-      ref?.current.data.datasets[0].data.push(data)
-      console.log(data)
-      ref?.current.update('quiet')
+      async function fetchPosts() {
+          let res = await fetch('/api/hello')
+          let btcData = await res.json()
+          if (btcData.time === null) return
+          
+          setCurrentBtcData(btcData)
+          
+          const data = { x: Date.now(), y: btcData.close }
+          ref?.current.data.datasets[0].data.push(data)
+          ref?.current.update('quiet')
+        }
+        fetchPosts()
+    }, 100)
+
+    const loadScoreboardData = async () => {
+        score = await fetchLeaderboardScores(1);
+        console.log("Score: " +  score)
     }
-    fetchPosts()
-  }, 100)
-
-  useEffect(() => {
-    if (!user)
-        return
-    var axios = require("axios").default;
-
-    var options = {
-      method: 'GET',
-      url: `${process.env.AUTH0_ISSUER_BASE_URL}/api/v2/users`,
-      params: {q: `email:"${user.email}"`, search_engine: 'v3'},
-      headers: {authorization: `Bearer ${process.env.AUTH0_MGMT_TOKEN}`}
-    };
     
-    axios.request(options).then(function (response) {
-      console.log(response.data);
-    }).catch(function (error) {
-      console.error(error);
-    });
-  }, [user])
+    useEffect(() => {
+        loadScoreboardData();
+        interval.start()
+        return interval.stop
+    }, [])
+    
+    function buyIn() {
+        if (currentBtcData === null) return
+        
+        const currentBtcClose = currentBtcData.close
+        
+        const transaction = {
+            id: crypto.randomUUID(),
+            type: 'buy',
+            btcPrice: currentBtcClose,
+            buyPrice: buyPrice,
+            time: new Date(),
+        }
+        
+        // console.log(transaction)
+        
+        transactionHistoryHandler.prepend(transaction)
+        
+        const line = {
+            drawTime: 'afterDatasetsDraw',
+      type: 'line',
+      scaleID: 'y',
+      value: currentBtcClose,
+      borderColor: '#a3e635',
+      borderWidth: 2,
+    }
 
-  /* useEffect(() => {
-    interval.start()
-    return interval.stop
-  }, [])
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
+
+    setBoughtIn(true)
+    setCurrentBal(currentBal - buyPrice)
+    setBuyPrice(100)
+  }
+  
+  if (isLoading) return <div>Loading...</div>;
+
+  function sellOut() {
+    if (currentBal === 0 || !boughtIn) return
+
+    const lastTransaction = transactionHistory[0]
+
+    const currentBtcClose = currentBtcData.close
+
+    // 550+(((432.61-433.82)*450)+450)
+
+    // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
+
+    const newBal =
+      currentBal + (currentBtcClose * (lastTransaction.buyPrice/lastTransaction.btcPrice))
+
+    const profit = 
+      ((currentBtcClose) * (lastTransaction.buyPrice/lastTransaction.btcPrice)) - lastTransaction.buyPrice
+
+    // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
+
+    const transaction = {
+      id: crypto.randomUUID(),
+      type: 'sell',
+      btcPrice: currentBtcClose,
+      buyPrice: lastTransaction.buyPrice,
+      profit: profit,
+      time: new Date(),
+    }
+
+    // console.log(transaction)
+
+    const line = {
+      drawTime: 'afterDatasetsDraw',
+      type: 'line',
+      scaleID: 'y',
+      value: currentBtcClose,
+      borderColor: '#f87171',
+      borderWidth: 2,
+    }
+
+    transactionHistoryHandler.prepend(transaction)
+
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
+
+    // console.log(ref?.current.config.options.plugins.annotation.annotations)
+
+    setBoughtIn(false)
+    setCurrentBal(newBal)
+  }
 
   return (
-    <div className='h-full'>
-      <RealtimeGraph ref={ref} datasetLabel={'BTC'} lineColor={'#ff0000'} />
+    <div className='h-full flex p-4'>
+      <div className='flex flex-row w-full'>
+        <div className='flex flex-col w-2/3'>
+          <Modal 
+            opened={opened} 
+            overlayProps={{
+                backgroundOpacity: 0.3,
+                blur: 3
+            }}
+            styles={{
+                header: {backgroundColor: '#2d2d2d'},
+                content: {backgroundColor: '#2d2d2d'}
+            }}
+            centered
+            onClose={user ? close : () => {}}
+            withCloseButton={false}
+          >
+            <Stack align='center'>
+              You must be logged to play.
+              <Button component={Link} href='/api/auth/login' w={"33%"}>
+                Login
+              </Button>
+            </Stack>
+          </Modal>
+          <div className='h-3/4'>
+            <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
+          </div>
+          <div className='flex flex-row space-x-8'>
+            <div className='flex flex-col space-y-4 w-52'>
+              <NumberInput
+                prefix='$'
+                value={buyPrice}
+                onChange={setBuyPrice}
+                allowNegative={false}
+                min={1}
+                hideControls
+              />
+              <ButtonGroup className='w-full'>
+                <Button
+                  variant='filled'
+                  color='green'
+                  className='w-full'
+                  onClick={buyIn}
+                  disabled={currentBal < buyPrice || boughtIn}
+                >
+                  BUY
+                </Button>
+                <Button
+                  variant='filled'
+                  color='red'
+                  className='w-full'
+                  onClick={sellOut}
+                  disabled={!boughtIn}
+                >
+                  SELL
+                </Button>
+              </ButtonGroup>
+            </div>
+            <p className='font-bold text-3xl'>
+              Balance: ${currentBal.toFixed(2)}
+            </p>
+            <ScrollArea h={250}>
+              {transactionHistory.map((transaction) => {
+                if (transaction.type === 'buy') {
+                  return (
+                    <Fragment key={transaction.id}>
+                      <BuyTransactionRow transaction={transaction} />
+                    </Fragment>
+                  )
+                } else {
+                  return (
+                    <Fragment key={transaction.id}>
+                      <SellTransactionRow transaction={transaction} />
+                    </Fragment>
+                  )
+                }
+              })}
+            </ScrollArea>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
