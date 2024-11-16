@@ -22,7 +22,11 @@ function loopThroughFiles(currentFileIndex) {
     })
     .on('end', (rowCount) => {
       console.log(`Parsed ${rowCount} rows`)
-      loopThroughFiles((currentFileIndex + 1) % fileNames.length)
+      if (currentFileIndex === fileNames.length - 1) {
+        console.log('All files parsed')
+      } else {
+        loopThroughFiles(currentFileIndex + 1)
+      }
     })
 }
 
@@ -41,6 +45,6 @@ if (global.current === 0) {
     btcData.open = parseFloat(data[current]?.Open)
     btcData.close = parseFloat(data[current]?.Close * varianceMultiplier + valueOffset)
     btcData.time = parseInt(data[current]?.Timestamp)
-    console.log(current)
+    console.log(current, data.length)
   }, 100)
 }
