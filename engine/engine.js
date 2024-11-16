@@ -1,8 +1,6 @@
 const fs = require('fs')
 const csv = require('fast-csv')
-const SingleInstance = require('single-instance')
 
-const locker = new SingleInstance('my-app-name')
 const data = []
 
 const fileNames = [
@@ -25,28 +23,21 @@ function loopThroughFiles(currentFileIndex) {
     })
 }
 
-var current = 0
+global.current = 0
+
 export var btcData = {
   open: 0,
   close: 0,
   time: null,
 }
-export var btcClose = 0
 
-locker
-  .lock()
-  .then(() => {
-    loopThroughFiles(0)
-
-    setInterval(() => {
-      current = current + 1
-      btcData.open = parseFloat(data[current]?.Open)
-      btcData.close = parseFloat(data[current]?.Close)
-      btcData.time = parseInt(data[current]?.Timestamp)
-      console.log(current)
-    }, 100)
-  })
-  .catch((err) => {
-    // This block will be executed if the app is already running
-    console.log(err) // it will print out 'An application is already running'
-  })
+if (global.current === 0) {
+  loopThroughFiles(0)
+  setInterval(() => {
+    current = current + 1
+    btcData.open = parseFloat(data[current]?.Open)
+    btcData.close = parseFloat(data[current]?.Close)
+    btcData.time = parseInt(data[current]?.Timestamp)
+    console.log(current)
+  }, 100)
+}
