@@ -1,21 +1,37 @@
 import { useEffect } from "react";
 
+const up = 0;
+const right = 45;
+const left = -45;
+
 export default function Bonsai() {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
   const centerY = height / 2;
-  const lineLength = 50;
+  const lineLength = 35;
   const gap = 10;
   const startingPoint = [centerX, height];
 
-  const points = [
-    [0, -1, true, "s"],
-    [-45, "s", false, "s1"],
-    [45, "s", false, "s2"],
-    [-45, "s1", false, "2r1"],
-    [45, "s1", false, "2r2"],
-    [0, "2r1", false, "2r3"],
+  let points = [
+    // Starting row
+    [up, -1, true, "s"],
+    [left, "s", false, "s1"],
+    [right, "s", false, "s2"],
+    // 2nd row
+    [left, "s1", false, "2r1"],
+    [right, "s1", false, "2r2"],
+    [up, "s2", false, "2r3"],
+    // 3rd row
+    [left, "2r1", false, "3r1"],
+    [right, "2r1", false, "3r2"],
+    [up, "2r2", false, "3r3"],
+    [right, "2r3", false, "3r4"],
+    // 4th row
+    [right, "3r1", false, "4r1"],
+    [left, "3r2", false, "4r2"],
+    [right, "3r2", false, "4r3"],
+    [right, "3r3", false, "4r4"],
   ];
 
   let references = {};
@@ -32,8 +48,8 @@ export default function Bonsai() {
       let label = point[3];
 
       let angle = passedAngle + 90;
-      let xDiff = Math.cos((angle * Math.PI) / 180) * lineLength;
-      let yDiff = Math.sin((angle * Math.PI) / 180) * lineLength;
+      let xDiff = lineLength / Math.tan((angle * Math.PI) / 180);
+      let yDiff = lineLength;
 
       let xRef;
       let yRef;
