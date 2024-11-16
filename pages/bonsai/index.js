@@ -9,14 +9,10 @@ export default function Bonsai() {
   const gap = 10;
 
   const points = [
-    [centerX, height, centerX, height - lineLength, false],
-    [
-      centerX,
-      height - lineLength - gap,
-      centerX,
-      height - lineLength * 2 - gap,
-      false,
-    ],
+    [centerX, centerY, 0, 0, true],
+    [centerX, centerY, 45, 1, false],
+    [centerX, centerY, -45, 1, false],
+    [centerX, centerY, -45, 2, false],
   ];
 
   useEffect(() => {
@@ -24,14 +20,27 @@ export default function Bonsai() {
     const ctx = canvas.getContext("2d");
 
     points.forEach((point) => {
+      let angle = point[2] + 90;
+      let xDiff = Math.cos((angle * Math.PI) / 180) * lineLength;
+      let yDiff = Math.sin((angle * Math.PI) / 180) * lineLength;
+
+      let xStart =
+        point[0] -
+        (point[2] < 0 ? gap * point[3] : 0) +
+        (point[2] > 0 ? gap * point[3] : 0);
+      let yStart = point[1] - lineLength * point[3] - gap * point[3];
+
+      let xEnd = xStart - xDiff;
+      let yEnd = yStart - yDiff - gap * point[3];
+
       ctx.beginPath();
-      ctx.moveTo(point[0], point[1]);
-      ctx.lineTo(point[2], point[3]);
-      ctx.lineWidth = 2;
-      ctx.shadowBlur = point[4] ? 4 : 0;
+      ctx.moveTo(xStart, yStart);
+      ctx.lineTo(xEnd, yEnd);
+      ctx.lineWidth = 4;
+      ctx.shadowBlur = point[4] ? 10 : 0;
       ctx.lineCap = "round";
       ctx.shadowColor = "blue";
-      ctx.strokeStyle = "white";
+      ctx.strokeStyle = point[4] ? "white" : "gray";
       ctx.stroke();
     });
   }, []);
