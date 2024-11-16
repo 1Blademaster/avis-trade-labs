@@ -10,7 +10,6 @@ import {
 import { useInterval, useListState } from '@mantine/hooks'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
-
 function BuyTransactionRow({ transaction }) {
   return (
     <div className='flex space-x-2 bg-green-300/50'>
@@ -60,10 +59,19 @@ export default function Home() {
       ref?.current.update('quiet')
 
       const lastTransaction = transactionHistory[0]
-      if (boughtIn && ((stopLoss)/100) <= (lastTransaction.btcPrice-currentBtcData.close)/lastTransaction.btcPrice){
+      if (
+        boughtIn &&
+        stopLoss / 100 <=
+          (lastTransaction.btcPrice - currentBtcData.close) /
+            lastTransaction.btcPrice
+      ) {
         sellOut()
-      }
-      else if (boughtIn && ((stopLoss)/100) <= -(lastTransaction.btcPrice-currentBtcData.close)/lastTransaction.btcPrice){
+      } else if (
+        boughtIn &&
+        stopLoss / 100 <=
+          -(lastTransaction.btcPrice - currentBtcData.close) /
+            lastTransaction.btcPrice
+      ) {
         sellOut()
       }
     }
@@ -97,6 +105,12 @@ export default function Home() {
       value: currentBtcClose,
       borderColor: '#a3e635',
       borderWidth: 2,
+      label: {
+        backgroundColor: '#a3e635',
+        content: `BUY: $${currentBtcClose}`,
+        display: true,
+        position: 'start',
+      },
     }
 
     ref?.current.config.options.plugins.annotation.annotations.pop()
@@ -147,6 +161,12 @@ export default function Home() {
       value: currentBtcClose,
       borderColor: '#f87171',
       borderWidth: 2,
+      label: {
+        backgroundColor: '#f87171',
+        content: `SELL: $${currentBtcClose}`,
+        display: true,
+        position: 'start',
+      },
     }
 
     transactionHistoryHandler.prepend(transaction)
@@ -198,14 +218,14 @@ export default function Home() {
                   SELL
                 </Button>
               </ButtonGroup>
-              <NumberInput 
+              <NumberInput
                 suffix='%'
                 value={stopLoss}
                 onChange={setStopLoss}
                 allowNegative={false}
                 hideControls
               />
-              <NumberInput 
+              <NumberInput
                 suffix='%'
                 value={takeProfit}
                 onChange={setTakeProfit}
