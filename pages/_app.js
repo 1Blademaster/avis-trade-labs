@@ -6,6 +6,7 @@ import '@/styles/globals.css'
 
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { createTheme, MantineProvider } from '@mantine/core'
+import Navbar from '@/components/navbar';
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -16,9 +17,10 @@ const theme = createTheme({
 export default function App({ Component, pageProps }) {
   return (
     <UserProvider>
-        <MantineProvider theme={theme}>
-            <Component {...pageProps} />;
-        </MantineProvider>
+      <MantineProvider theme={theme}>
+        <Navbar />
+        <Component {...pageProps} />;
+      </MantineProvider>
     </UserProvider>
   )
 }
