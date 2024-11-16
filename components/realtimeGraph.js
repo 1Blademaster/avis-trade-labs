@@ -1,7 +1,6 @@
 import ChartStreaming from '@robloche/chartjs-plugin-streaming'
 import {
   Chart as ChartJS,
-  Legend,
   LineElement,
   LinearScale,
   PointElement,
@@ -15,7 +14,6 @@ import { forwardRef, useEffect, useState } from 'react'
 import { Scatter } from 'react-chartjs-2'
 ChartJS.register(
   Title,
-  Legend,
   TimeScale,
   LinearScale,
   PointElement,
@@ -36,31 +34,25 @@ const options = {
     intersect: false,
   },
   plugins: {
-    legend: {
-      position: 'top',
-    },
     streaming: {
       duration: 20000,
       frameRate: 30,
     },
     annotation: {
-      annotations: [
-        // {
-        //   drawTime: 'afterDatasetsDraw',
-        //   type: 'line',
-        //   scaleID: 'y',
-        //   value: 430,
-        //   borderColor: 'green',
-        //   borderWidth: 3,
-        //   display: false,
-        // },
-      ],
+      annotations: [],
     },
   },
   scales: {
     x: {
       type: 'realtime',
       duration: 20000,
+      display: false,
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Price ($)',
+      },
     },
   },
   elements: {
@@ -74,10 +66,7 @@ const options = {
   },
 }
 
-const RealtimeGraph = forwardRef(function RealtimeGraph(
-  { datasetLabel, lineColor },
-  ref
-) {
+const RealtimeGraph = forwardRef(function RealtimeGraph({ datasetLabel }, ref) {
   const [chartData] = useState({
     datasets: [
       {

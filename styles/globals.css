@@ -18,12 +18,12 @@ body {
 }
 :root {
   --background: #f1f5f9;
-  --foreground: #1e293b;
+  --foreground: #0f172a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1e293b;
+    --background: #0f172a;
     --foreground: #f1f5f9;
   }
 }
