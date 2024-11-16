@@ -164,7 +164,7 @@ export default function Home() {
   return (
     <div className='h-full flex p-4'>
       <div className='flex flex-row w-full space-x-4'>
-        <div className='flex flex-col'>
+        <div className='flex flex-col w-full'>
           <div className='h-3/4'>
             <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
           </div>
