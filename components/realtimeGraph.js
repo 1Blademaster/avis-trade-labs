@@ -12,7 +12,6 @@ import {
 import 'chartjs-adapter-moment'
 import { forwardRef, useEffect, useState } from 'react'
 import { Scatter } from 'react-chartjs-2'
-
 ChartJS.register(
   Title,
   Legend,
@@ -26,17 +25,14 @@ ChartJS.register(
 
 ChartJS.defaults.color = '#fafafa'
 
-// Helper function to convert hex color to rgba
-function hexToRgba(hex, alpha) {
-  const [r, g, b] = hex.match(/\w\w/g).map((x) => parseInt(x, 16))
-  return `rgba(${r},${g},${b},${alpha})`
-}
-
 const options = {
   responsive: true,
   maintainAspectRatio: false,
   showLine: true,
   animation: false,
+  interaction: {
+    intersect: false,
+  },
   plugins: {
     legend: {
       position: 'top',
@@ -45,10 +41,28 @@ const options = {
       duration: 20000,
       frameRate: 30,
     },
+    annotation: {
+      annotations: {
+        line: {
+          drawTime: 'afterDatasetsDraw',
+          type: 'line',
+          scaleID: 'y',
+          value: 430,
+          borderColor: 'black',
+          borderWidth: 5,
+          label: {
+            backgroundColor: 'red',
+            content: 'Test Label',
+            enabled: true,
+          },
+        },
+      },
+    },
   },
   scales: {
     x: {
       type: 'realtime',
+      duration: 20000,
     },
   },
   elements: {

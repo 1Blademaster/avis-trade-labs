@@ -14,6 +14,7 @@
     "@robloche/chartjs-plugin-streaming": "^3.1.0",
     "chart.js": "^4.4.6",
     "chartjs-adapter-moment": "^1.0.1",
+    "chartjs-plugin-annotation": "^3.1.0",
     "fast-csv": "^5.0.2",
     "moment": "^2.30.1",
     "next": "15.0.3",
