@@ -1,7 +1,6 @@
 import ChartStreaming from '@robloche/chartjs-plugin-streaming'
 import {
   Chart as ChartJS,
-  Legend,
   LineElement,
   LinearScale,
   PointElement,
@@ -10,45 +9,50 @@ import {
   Tooltip,
 } from 'chart.js'
 import 'chartjs-adapter-moment'
+import Annotation from 'chartjs-plugin-annotation'
 import { forwardRef, useEffect, useState } from 'react'
 import { Scatter } from 'react-chartjs-2'
-
 ChartJS.register(
   Title,
-  Legend,
   TimeScale,
   LinearScale,
   PointElement,
   LineElement,
   Tooltip,
-  ChartStreaming
+  ChartStreaming,
+  Annotation
 )
 
 ChartJS.defaults.color = '#fafafa'
-
-// Helper function to convert hex color to rgba
-function hexToRgba(hex, alpha) {
-  const [r, g, b] = hex.match(/\w\w/g).map((x) => parseInt(x, 16))
-  return `rgba(${r},${g},${b},${alpha})`
-}
 
 const options = {
   responsive: true,
   maintainAspectRatio: false,
   showLine: true,
   animation: false,
+  interaction: {
+    intersect: false,
+  },
   plugins: {
-    legend: {
-      position: 'top',
-    },
     streaming: {
       duration: 20000,
       frameRate: 30,
+    },
+    annotation: {
+      annotations: [],
     },
   },
   scales: {
     x: {
       type: 'realtime',
+      duration: 20000,
+      display: false,
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Price ($)',
+      },
     },
   },
   elements: {
@@ -62,10 +66,7 @@ const options = {
   },
 }
 
-const RealtimeGraph = forwardRef(function RealtimeGraph(
-  { datasetLabel, lineColor },
-  ref
-) {
+const RealtimeGraph = forwardRef(function RealtimeGraph({ datasetLabel }, ref) {
   const [chartData] = useState({
     datasets: [
       {

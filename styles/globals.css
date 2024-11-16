@@ -17,14 +17,14 @@ body {
   height: 100%;
 }
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1f5f9;
+  --foreground: #0f172a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
   }
 }
 

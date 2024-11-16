@@ -1,5 +1,5 @@
-import { btcClose } from '@/engine/engine'
+import { btcData } from '@/engine/engine'
 
 export default function handler(req, res) {
-  res.status(200).json({ close: btcClose })
+  res.status(200).json(btcData)
 }

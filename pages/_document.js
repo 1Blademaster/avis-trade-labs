@@ -1,3 +1,4 @@
+import Navbar from '@/components/navbar'
 import { ColorSchemeScript } from '@mantine/core'
 import { Head, Html, Main, NextScript } from 'next/document'
 
@@ -8,6 +9,7 @@ export default function Document() {
         <ColorSchemeScript defaultColorScheme='auto' />
       </Head>
       <body>
+        <Navbar />
         <Main className='h-full' />
         <NextScript />
       </body>

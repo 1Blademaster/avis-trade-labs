@@ -1,36 +1,50 @@
 const fs = require('fs')
-const path = require('path')
 const csv = require('fast-csv')
+
+const varianceMultiplier = 1000
+const valueOffset = -427500
 
 const data = []
 
 const fileNames = [
-  'data/btcusd_2016-min_data.csv', 
-  'data/btcusd_2018-min_data.csv', 
-  'data/btcusd_2020-min_data.csv', 
-  'data/btcusd_2022-min_data.csv'
+  'data/btcusd_2016-min_data.csv',
+  'data/btcusd_2018-min_data.csv',
+  'data/btcusd_2020-min_data.csv',
+  'data/btcusd_2022-min_data.csv',
 ]
 
-function loopThroughFiles(currentFileIndex){
+function loopThroughFiles(currentFileIndex) {
   fs.createReadStream(fileNames[currentFileIndex])
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
-      data.push(row)
+      data.push({ Close: row.Close, Timestamp: row.Timestamp })
     })
     .on('end', (rowCount) => {
       console.log(`Parsed ${rowCount} rows`)
-      loopThroughFiles((currentFileIndex+1)%fileNames.length)
+      if (currentFileIndex === fileNames.length - 1) {
+        console.log('All files parsed')
+      } else {
+        loopThroughFiles(currentFileIndex + 1)
+      }
     })
 }
 
-loopThroughFiles(0)
+global.current = 0
 
-var current = 0
-export var btcClose = 0
+export var btcData = {
+  close: 0,
+  time: null,
+}
 
-setInterval(() => {
-  current = current + 1
-  btcClose = data[current].Close
-  console.log(data.length, current, data[current], btcClose)
-}, 1000)
+if (global.current === 0) {
+  loopThroughFiles(0)
+  setInterval(() => {
+    current = current + 1
+    btcData.close = parseFloat(
+      data[current]?.Close * varianceMultiplier + valueOffset
+    )
+    btcData.time = parseInt(data[current]?.Timestamp)
+    console.log(current, data.length)
+  }, 100)
+}
