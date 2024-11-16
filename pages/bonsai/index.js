@@ -34,7 +34,6 @@ export default function Bonsai() {
     [right, "3r3", false, "4r4", true],
     [left, "3r4", false, "4r5", true],
     [right, "3r4", false, "4r6"],
-    [left, "3r3", false, "4r7"], // Testing
     // 5th row
     [up, "4r2", false, "5r1"],
     [left, "4r3", false, "5r2"],
