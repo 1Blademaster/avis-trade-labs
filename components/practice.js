@@ -253,21 +253,6 @@ export default function Practice({ backendUrl, startBalance, target }) {
       time: new Date(),
     };
 
-    if (user) {
-      console.log(user);
-      const res = await fetch("/api/leaderboard/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_email: user.email,
-          profit: profit,
-        }),
-      });
-      console.log(res);
-    }
-
     const line = {
       drawTime: "afterDatasetsDraw",
       type: "line",

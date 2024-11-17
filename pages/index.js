@@ -59,7 +59,6 @@ export default function Home() {
         let totalData = await res.json();
         let newTotal = totalData[0].total;
 
-        console.log(newTotal, total, newTotal - total);
         if (newTotal - total > 100) {
           console.log("Price increase, growing bonsai!");
           let newBranchButton = document.getElementById("newBranch");
