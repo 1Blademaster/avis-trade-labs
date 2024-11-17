@@ -1,4 +1,4 @@
-import Bonsai from '@/components/bonsai.js'
+import { Bonsai } from '@/components/bonsai.js'
 import Leaderboard from '@/components/leaderboard'
 import RealtimeGraph from '@/components/realtimeGraph'
 
