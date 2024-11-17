@@ -47,6 +47,38 @@ export default function Home() {
   const [opened, { open, close }] = useDisclosure(REQUIRE_LOGIN && !user);
 
   const [transactionHistory, transactionHistoryHandler] = useListState([]);
+  let total = 0;
+
+  useEffect(() => {
+    let newGraphButton = document.getElementById("newGraph");
+    newGraphButton.click();
+
+    const interval = setInterval(() => {
+      async function getTotal() {
+        let res = await fetch("/api/leaderboard/total");
+        let totalData = await res.json();
+        let newTotal = totalData[0].total;
+
+        console.log(newTotal, total, newTotal - total);
+        if (newTotal - total > 100) {
+          console.log("Price increase, growing bonsai!");
+          let newBranchButton = document.getElementById("newBranch");
+          newBranchButton.click();
+          total = newTotal;
+        } else if (newTotal - total < -100) {
+          console.log("Bonsai sad :c");
+          let deleteBranchButton = document.getElementById("removeBranch");
+          deleteBranchButton.click();
+          total = newTotal;
+        }
+      }
+
+      console.log("Checking");
+      getTotal();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useInterval(
     () => {

@@ -1,33 +1,37 @@
-import { Table } from '@mantine/core'
-import { useInterval } from '@mantine/hooks'
-import { useEffect, useState } from 'react'
+import { Table } from "@mantine/core";
+import { useInterval } from "@mantine/hooks";
+import { useEffect, useState } from "react";
 
 export default function Leaderboard({ username }) {
-  const [leaderboardData, setLeaderboardData] = useState([])
+  const [leaderboardData, setLeaderboardData] = useState([]);
 
   const getLeaderboardData = async () => {
-    let res = await fetch('/api/leaderboard/get')
-    let tempLeaderboard = await res.json()
-    setLeaderboardData(tempLeaderboard)
-  }
+    let res = await fetch("/api/leaderboard/get");
+    let tempLeaderboard = await res.json();
+    setLeaderboardData(tempLeaderboard);
+  };
 
   useEffect(() => {
-    getLeaderboardData()
-  }, [])
-
-  useInterval(() => {
     getLeaderboardData();
-  }, 100, {autoInvoke: true})
+  }, []);
+
+  useInterval(
+    () => {
+      getLeaderboardData();
+    },
+    100,
+    { autoInvoke: true }
+  );
 
   function formatProfit(profit) {
     return profit
       ? profit < 0
-        ? '$-' + Math.abs(profit).toFixed(2)
-        : '$' + profit.toFixed(2)
-      : ''
+        ? "$-" + Math.abs(profit).toFixed(2)
+        : "$" + profit.toFixed(2)
+      : "";
   }
 
-  const rowsDisplayed = 20
+  const rowsDisplayed = 20;
 
   return (
     <Table>
@@ -43,35 +47,39 @@ export default function Leaderboard({ username }) {
         {[
           ...leaderboardData,
           ...Array(rowsDisplayed - leaderboardData.length).fill({
-            username: '',
-            _id: '',
-            profit: '',
+            username: "",
+            _id: "",
+            profit: "",
           }),
         ].map((user, idx) => {
-          var podiumClassName = ''
+          var podiumClassName = "";
 
           if (idx === 0) {
-            podiumClassName = 'bg-amber-300/50'
+            podiumClassName = "bg-amber-300/50";
           } else if (idx === 1) {
-            podiumClassName = 'bg-green-300/50'
+            podiumClassName = "bg-green-300/50";
           } else if (idx === 2) {
-            podiumClassName = 'bg-blue-300/50'
+            podiumClassName = "bg-blue-300/50";
           }
 
           if (user.username === username) {
-            podiumClassName += ' font-bold text-lime-400'
+            podiumClassName += " font-bold text-lime-400";
           }
-          console.log(user)
+
           return (
             <Table.Tr key={`tr${idx}`} className={podiumClassName}>
               <Table.Td>{idx + 1}</Table.Td>
               <Table.Td>{user.username}</Table.Td>
               <Table.Td>{formatProfit(user.profit)}</Table.Td>
-              <Table.Td>{user.latestTransactionDetails ? formatProfit(user.latestTransactionDetails.profit) : ''}</Table.Td>
+              <Table.Td>
+                {user.latestTransactionDetails
+                  ? formatProfit(user.latestTransactionDetails.profit)
+                  : ""}
+              </Table.Td>
             </Table.Tr>
-          )
+          );
         })}
       </Table.Tbody>
     </Table>
-  )
+  );
 }
