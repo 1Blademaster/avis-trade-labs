@@ -287,8 +287,7 @@ export default function Home() {
             <Overlay color='#000' backgroundOpacity={0.35} blur={15}>
               <div className='w-1/3 h-full mx-auto text-center flex flex-col items-center justify-center space-y-8'>
                 <p>
-                  Get ready to buy low and sell high! You will have 60 seconds
-                  to make as much profit as you can to add to your total on the
+                  Get ready to buy low and sell high! Make as much profit as you can to add to your total on the
                   global leaderboard and grow our money tree.
                 </p>
                 <Button
