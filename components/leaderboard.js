@@ -1,4 +1,5 @@
 import { Table } from '@mantine/core'
+import { useEffect, useState } from 'react';
 
 const users = [
   { id: 1, username: 'Kush', totalProfit: 143663 },
@@ -28,8 +29,22 @@ const users = [
 ].sort((a, b) => b.totalProfit - a.totalProfit)
 
 export default function Leaderboard() {
+
+  const [currentLeaderboard, setLeaderboard] = useState([]);
+
+  async function fetchLeaderboard(){
+    let res = await fetch("http://localhost:3000/api/leaderboard/get")
+    let leaderboard = await res.json();
+    console.log("Leaderboard: "+ leaderboard[0].username);
+    setLeaderboard(leaderboard);
+  }
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
+
   const rowsDisplayed = 20
-  const rows = users.slice(0, rowsDisplayed).map((user, idx) => {
+  const rows = currentLeaderboard.map((user, idx) => {
     var podiumClassName = ''
 
     if (idx === 0) {
@@ -44,7 +59,7 @@ export default function Leaderboard() {
       <Table.Tr key={user.id} className={podiumClassName}>
         <Table.Td>{idx + 1}</Table.Td>
         <Table.Td>{user.username}</Table.Td>
-        <Table.Td>${user.totalProfit}</Table.Td>
+        <Table.Td>${user.profit}</Table.Td>
       </Table.Tr>
     )
   })
@@ -58,7 +73,9 @@ export default function Leaderboard() {
           <Table.Th>Total Profit</Table.Th>
         </Table.Tr>
       </Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
+      <Table.Tbody>
+        {rows}
+      </Table.Tbody>
     </Table>
   )
 }
