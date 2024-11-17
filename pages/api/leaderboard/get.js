@@ -28,14 +28,26 @@ export default async function handler(req, res){
     { $unwind: { path: "$userTransactions", preserveNullAndEmptyArrays: true } },
     {
       $group: {
-        _id: "$_id", // Group by user ID
-        profit: { $first: "$profit" }, // Preserve the totalProfit field
-        username: {$first: "$username"},
-        latestTransaction: {
-          $max: "$userTransactions.createtime" // Find the latest transaction time
-        },
+        _id: "$_id",
+        username: { $first: "$username" },
+        profit: { $first: "$profit" },
+        latestTransactionTime: { $max: "$userTransactions.createtime" },
+        allTransactions: { $push: "$userTransactions" } // Preserve all transactions
+      }
+    },
+    {
+      $addFields: {
         latestTransactionDetails: {
-          $first: "$userTransactions" // Capture the entire latest transaction details
+          $arrayElemAt: [
+            {
+              $filter: {
+                input: "$allTransactions",
+                as: "transaction",
+                cond: { $eq: ["$$transaction.createtime", "$latestTransactionTime"] }
+              }
+            },
+            0
+          ]
         }
       }
     },

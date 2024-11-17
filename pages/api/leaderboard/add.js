@@ -5,26 +5,15 @@ export async function addProfit(user_email, profitMade) {
   const client = await clientPromise
   const db = client.db('AvisCodeLabs')
 
-  let user = await db.collection('Users').findOne({ email: user_email })
-
-  if (user) {
-    // user has an account
-    await db
-      .collection('Users')
-      .updateOne(
-        { _id: new ObjectId(user._id) },
-        { $inc: { profit: profitMade } }
-      )
-  } else {
-    await db.collection('Users').insertOne({
-      username: user_email.split('@')[0],
-      email: user_email,
-      profit: profitMade,
-    })
-    user = await db.collection('Users').findOne({ email: user_email })
-  }
+  const result = await db.collection("Users").findOneAndUpdate(
+    { email: user_email }, // Match by email
+    { $setOnInsert: {username: user_email.split('@')[0], email: user_email} }, // Update user fields
+    { $inc: {profit: profitMade }},
+    { upsert: true, returnDocument: "after" } // Insert if not exists, return the updated doc
+  );
+  const userId = result._id;
   await db.collection('Leaderboard').insertOne({
-    user_id: new ObjectId(user._id),
+    user_id: new ObjectId(userId),
     profit: profitMade,
     createtime: new Timestamp()
   })
