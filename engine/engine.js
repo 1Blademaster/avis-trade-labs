@@ -5,6 +5,7 @@ const varianceMultiplier = 50
 const valueOffset = -(427500 / 20)
 
 global.data = []
+const maxDataLength = 4_500_000
 
 const fileNames = [
   'data/btcusd_2016-min_data.csv',
@@ -18,6 +19,9 @@ function loopThroughFiles(currentFileIndex) {
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
+      if (global.data.length >= maxDataLength) {
+        return
+      }
       global.data.push({ Close: row.Close, Timestamp: row.Timestamp })
     })
     .on('end', (rowCount) => {
