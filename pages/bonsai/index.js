@@ -11,7 +11,7 @@ export default function Bonsai() {
   const centerX = width / 2;
   const gap = 7.5;
   const startingPoint = [centerX, height];
-  let lastBranchId = "3r2";
+  let lastBranchId = "3r0";
   let lineWidth = 4;
   let lineLength = 20;
   let treeHeight = 3;
@@ -32,7 +32,6 @@ export default function Bonsai() {
     initDraw();
 
     let [failedLine, failedOn] = generateLines(ctx, treeHeight);
-    console.log(lastBranchId, failedOn);
     if (lastBranchId == failedOn) {
       treeHeight += 1;
       lastBranchId = `${treeHeight}r0`;
@@ -43,9 +42,39 @@ export default function Bonsai() {
     }
   }
 
+  function deleteLastBranch() {
+    ctx.clearRect(0, 0, width, height);
+
+    let splitBranch = lastBranchId.split("r");
+    if (splitBranch[0] > 2) {
+      if (splitBranch[1] == 0) {
+        treeHeight -= 1;
+        let lastKeys = Object.keys(references).filter((key) =>
+          key.startsWith(`${treeHeight}r`)
+        );
+
+        let max = 0;
+        lastKeys.forEach((key) => {
+          let branchId = Number(key.split("r")[1]);
+          if (branchId > max) {
+            max = branchId;
+          }
+        });
+
+        lastBranchId = `${treeHeight}r${max}`;
+      } else {
+        lastBranchId = `${splitBranch[0]}r${splitBranch[1] - 1}`;
+      }
+    }
+
+    initDraw();
+    generateLines(ctx, treeHeight);
+  }
+
   function generateNextLayer() {
     ctx.clearRect(0, 0, width, height);
     treeHeight += 1;
+    lastBranchId = `${treeHeight}r0`;
     initDraw();
     generateLines(ctx, treeHeight);
   }
@@ -53,6 +82,7 @@ export default function Bonsai() {
   function deleteLastLayer() {
     ctx.clearRect(0, 0, width, height);
     treeHeight -= 1;
+    lastBranchId = `${treeHeight}r0`;
     initDraw();
     generateLines(ctx, treeHeight);
   }
@@ -282,7 +312,7 @@ export default function Bonsai() {
     <>
       <button onClick={() => drawGraph()}>New</button>
       <button onClick={() => generateNextBranch()}>Add</button>
-      <button onClick={() => deleteLastLayer()}>Remove</button>
+      <button onClick={() => deleteLastBranch()}>Remove</button>
       <canvas
         className="w-2/3 h-2/3"
         id="bonsai-canvas"
