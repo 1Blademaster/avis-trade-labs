@@ -9,9 +9,11 @@ import {
   Table,
 } from '@mantine/core'
 import { useInterval, useListState } from '@mantine/hooks'
-import { useEffect, useRef, useState } from 'react'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../tailwind.config.js'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { Checkbox } from '@mantine/core'
+
 
 const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
@@ -24,6 +26,8 @@ export default function Home() {
   const [buyPrice, setBuyPrice] = useState(100)
   const [currentBal, setCurrentBal] = useState(1000)
   const [boughtIn, setBoughtIn] = useState(false)
+  const [stopLossEnabled, setStopLossEnabled] = useState(false)
+  const [takeProfitEnabled, setTakeProfitEnabled] = useState(false)
   const [stopLoss, setStopLoss] = useState(20)
   const [takeProfit, setTakeProfit] = useState(20)
 
@@ -43,15 +47,16 @@ export default function Home() {
 
       const lastTransaction = transactionHistory[0]
       if (
-        boughtIn &&
+        boughtIn && stopLossEnabled &&
         stopLoss / 100 <=
           (lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
         sellOut()
-      } else if (
-        boughtIn &&
-        stopLoss / 100 <=
+      } 
+      if (
+        boughtIn && takeProfitEnabled &&
+        takeProfit / 100 <=
           -(lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
@@ -119,10 +124,6 @@ export default function Home() {
 
     const currentBtcClose = currentBtcData.close
 
-    // 550+(((432.61-433.82)*450)+450)
-
-    // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
-
     const newBal =
       currentBal +
       currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice)
@@ -130,8 +131,6 @@ export default function Home() {
     const profit =
       currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice) -
       lastTransaction.buyPrice
-
-    // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
     const transaction = {
       id: crypto.randomUUID(),
@@ -141,8 +140,6 @@ export default function Home() {
       profit: profit,
       time: new Date(),
     }
-
-    // console.log(transaction)
 
     const line = {
       drawTime: 'afterDatasetsDraw',
@@ -164,9 +161,7 @@ export default function Home() {
     ref?.current.config.options.plugins.annotation.annotations.pop()
     ref?.current.config.options.plugins.annotation.annotations.push(line)
     ref?.current.update('quiet')
-
-    // console.log(ref?.current.config.options.plugins.annotation.annotations)
-
+    
     setCurrentBal(newBal)
   }
 
@@ -190,7 +185,7 @@ export default function Home() {
               <ButtonGroup className='w-full'>
                 <Button
                   variant='filled'
-                  color={tailwindColors.lime[500]}
+                  color='#a3e635'
                   className='w-full'
                   onClick={buyIn}
                   disabled={currentBal < buyPrice || boughtIn}
@@ -211,15 +206,29 @@ export default function Home() {
                 suffix='%'
                 value={stopLoss}
                 onChange={setStopLoss}
+                disabled={!stopLossEnabled}
                 allowNegative={false}
                 hideControls
+              />
+              <Checkbox
+                label="Stop Loss"
+                color='#a3e635'
+                checked={stopLossEnabled}
+                onChange={(e) => setStopLossEnabled(e.currentTarget.checked)}
               />
               <NumberInput
                 suffix='%'
                 value={takeProfit}
                 onChange={setTakeProfit}
                 allowNegative={false}
+                disabled={!takeProfitEnabled}
                 hideControls
+              />    
+              <Checkbox
+                label="Take Profit"
+                color="lime"
+                checked={takeProfitEnabled}
+                onChange={(e) => setTakeProfitEnabled(e.currentTarget.checked)}
               />
             </div>
             <p className='font-bold text-3xl'>
