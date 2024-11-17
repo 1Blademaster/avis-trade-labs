@@ -53,6 +53,6 @@ if (global.current === 0) {
       data[current]?.Close * varianceMultiplier + valueOffset
     )
     btcData.time = parseInt(data[current]?.Timestamp)
-    console.log(current, btcData)
+    // console.log(current, btcData)
   }, 10)
 }

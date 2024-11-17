@@ -34,8 +34,8 @@ export default function Home() {
 
   const [currentBtcData, setCurrentBtcData] = useState(null)
 
-  const [buyPrice, setBuyPrice] = useState(100)
-  const [currentBal, setCurrentBal] = useState(1000)
+  const [buyPrice, setBuyPrice] = useState(1000)
+  const [currentBal, setCurrentBal] = useState(10000)
   const [boughtIn, setBoughtIn] = useState(false)
   const [stopLossEnabled, setStopLossEnabled] = useState(false)
   const [takeProfitEnabled, setTakeProfitEnabled] = useState(false)
@@ -214,7 +214,7 @@ export default function Home() {
     setBuyPrice(100)
   }
 
-  function sellOut() {
+  async function sellOut() {
     if (!boughtIn) return
 
     setBoughtIn(false)
@@ -238,6 +238,21 @@ export default function Home() {
       buyPrice: lastTransaction.buyPrice,
       profit: profit,
       time: new Date(),
+    }
+
+    if (user) {
+      console.log(user)
+      const res = await fetch('/api/leaderboard/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_email: user.email,
+          profit: profit,
+        }),
+      })
+      console.log(res)
     }
 
     const line = {
