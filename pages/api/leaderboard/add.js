@@ -7,8 +7,6 @@ export async function addProfit(user_email, profitMade) {
 
   let user = await db.collection('Users').findOne({ email: user_email })
 
-  console.log(user)
-
   if (user) {
     // user has an account
     await db
