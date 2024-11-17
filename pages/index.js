@@ -86,6 +86,8 @@ export default function Home() {
   function buyIn() {
     if (currentBtcData === null) return
 
+    setBoughtIn(true)
+
     const currentBtcClose = currentBtcData.close
 
     const transaction = {
@@ -117,13 +119,14 @@ export default function Home() {
     ref?.current.config.options.plugins.annotation.annotations.push(line)
     ref?.current.update('quiet')
 
-    setBoughtIn(true)
     setCurrentBal(currentBal - buyPrice)
     setBuyPrice(100)
   }
 
   function sellOut() {
     if (!boughtIn) return
+
+    setBoughtIn(false)
 
     const lastTransaction = transactionHistory[0]
 
@@ -177,14 +180,13 @@ export default function Home() {
 
     // console.log(ref?.current.config.options.plugins.annotation.annotations)
 
-    setBoughtIn(false)
     setCurrentBal(newBal)
   }
 
   return (
-    <div className='h-full flex p-4'>
+    <div className='flex p-4'>
       <div className='flex flex-row w-full space-x-4'>
-        <div className='flex flex-col w-full'>
+        <div className='flex flex-col w-full space-y-8'>
           <div className='h-3/4'>
             <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
           </div>
@@ -236,7 +238,7 @@ export default function Home() {
             <p className='font-bold text-3xl'>
               Balance: ${currentBal.toFixed(2)}
             </p>
-            <ScrollArea h={250}>
+            <ScrollArea h={200}>
               {transactionHistory.map((transaction) => {
                 if (transaction.type === 'buy') {
                   return (
