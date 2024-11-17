@@ -4,19 +4,22 @@ import clientPromise from '../../../lib/mongodb'
 export async function addProfit(user_email, profitMade) {
   const client = await clientPromise
   const db = client.db('AvisCodeLabs')
-
+  console.log("Incrememnting by " + profitMade)
   const result = await db.collection("Users").findOneAndUpdate(
     { email: user_email }, // Match by email
-    { $setOnInsert: {username: user_email.split('@')[0], email: user_email} }, // Update user fields
-    { $inc: {profit: profitMade }},
-    { upsert: true, returnDocument: "after" } // Insert if not exists, return the updated doc
-  );
+    { 
+      $setOnInsert: {username: user_email.split('@')[0], email: user_email}, 
+      $inc: {profit: profitMade }
+    },
+    { upsert: true, returnDocument: "after"});
   const userId = result._id;
   await db.collection('Leaderboard').insertOne({
     user_id: new ObjectId(userId),
     profit: profitMade,
     createtime: new Timestamp()
   })
+
+  await session.commitTransaction();
 }
 
 export default async function handler(req, res) {
