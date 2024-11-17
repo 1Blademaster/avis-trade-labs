@@ -42,8 +42,8 @@ export default function Practice() {
   })
 
   return (
-    <div className="overflow-x-hidden">
-      <div className="flex w-screen justify-center gap-x-8 w-3/4 m-4">
+    <div className="overflow-x-hidden h-screen">
+      <div className="flex w-screen h-[80%] items-center justify-center gap-x-8 w-3/4 m-4">
         {cards}
       </div>
     </div>
