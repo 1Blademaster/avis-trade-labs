@@ -11,10 +11,11 @@ export default function Bonsai() {
   const centerX = width / 2;
   const gap = 7.5;
   const startingPoint = [centerX, height];
-  let lastBranchId = "3r0";
+  let lastBranchId = "3r-1";
   let lineWidth = 4;
   let lineLength = 20;
   let treeHeight = 3;
+  let firstTimeSkip = true;
   let ctx;
   let points;
   let references;
@@ -39,6 +40,11 @@ export default function Bonsai() {
       if (failedLine) {
         lastBranchId = failedOn;
       }
+    }
+
+    if (firstTimeSkip) {
+      firstTimeSkip = false;
+      generateNextBranch();
     }
   }
 
@@ -65,6 +71,8 @@ export default function Bonsai() {
       } else {
         lastBranchId = `${splitBranch[0]}r${splitBranch[1] - 1}`;
       }
+    } else {
+      firstTimeSkip = true;
     }
 
     initDraw();
