@@ -9,7 +9,6 @@ export default function Document() {
         <ColorSchemeScript defaultColorScheme='auto' />
       </Head>
       <body>
-        <Navbar />
         <Main className='h-full' />
         <NextScript />
       </body>

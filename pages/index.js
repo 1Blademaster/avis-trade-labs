@@ -11,10 +11,11 @@ import {
   Table,
   Tooltip,
 } from '@mantine/core'
-import { useInterval, useListState } from '@mantine/hooks'
+import { useDisclosure, useInterval, useListState } from '@mantine/hooks'
 import { useEffect, useRef, useState } from 'react'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../tailwind.config.js'
+import { useUser } from '@auth0/nextjs-auth0/client.js'
 
 const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
@@ -31,6 +32,10 @@ export default function Home() {
   const [takeProfitEnabled, setTakeProfitEnabled] = useState(false)
   const [stopLoss, setStopLoss] = useState(20)
   const [takeProfit, setTakeProfit] = useState(20)
+
+  const REQUIRE_LOGIN = false;
+  const {user, error, isLoading} = useUser();
+  const [opened, {open, close}] = useDisclosure(REQUIRE_LOGIN && !user);
 
   const [transactionHistory, transactionHistoryHandler] = useListState([])
 
