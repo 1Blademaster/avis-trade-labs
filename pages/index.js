@@ -67,16 +67,21 @@ export default function Home() {
             newBranchButton.click();
           }
           graphInit = true;
-        }
-
-        if (newTotal - total > 1000) {
-          console.log("Price increase, growing bonsai!");
-          newBranchButton.click();
           total = newTotal;
-        } else if (newTotal - total < -1000) {
-          console.log("Bonsai sad :c");
-          deleteBranchButton.click();
-          total = newTotal;
+        } else {
+          if (newTotal - total > 1000) {
+            console.log("Price increase, growing bonsai!");
+            for (let i = 0; i <= Math.abs(newTotal - total); i += 1000) {
+              newBranchButton.click();
+            }
+            total = newTotal;
+          } else if (newTotal - total < -1000) {
+            console.log("Bonsai sad :c");
+            for (let i = 0; i <= Math.abs(newTotal - total); i += 1000) {
+              deleteBranchButton.click();
+            }
+            total = newTotal;
+          }
         }
       }
 
