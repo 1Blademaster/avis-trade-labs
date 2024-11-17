@@ -474,7 +474,7 @@ export default function Home() {
         <Divider orientation='vertical' color='darkgray' />
 
         <div className='w-1/3'>
-          <Tabs defaultValue='leaderboard' color='dark'>
+          <Tabs defaultValue='leaderboard'>
             <Tabs.List grow>
               <Tabs.Tab value='leaderboard' className='hover:bg-slate-800'>
                 Leaderboard
