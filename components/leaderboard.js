@@ -67,7 +67,7 @@ export default function Leaderboard({ username }) {
               <Table.Td>{idx + 1}</Table.Td>
               <Table.Td>{user.username}</Table.Td>
               <Table.Td>{formatProfit(user.profit)}</Table.Td>
-              <Table.Td>{user.last_trade ? formatProfit(user.last_trade.profit) : '-'}</Table.Td>
+              <Table.Td>{user.last_trade ? formatProfit(user.last_trade.profit) : ''}</Table.Td>
             </Table.Tr>
           )
         })}
