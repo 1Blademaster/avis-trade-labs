@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import clientPromise from "../../lib/mongodb"
+import clientPromise from "../../../lib/mongodb"
 
 export async function getUser(uuid){
     const client = await clientPromise;

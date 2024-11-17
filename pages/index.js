@@ -10,6 +10,7 @@ import {
   Divider,
   Modal,
   NumberInput,
+  Overlay,
   Paper,
   ScrollArea,
   Stack,
@@ -29,6 +30,8 @@ export default function Home() {
   const ref = useRef(null)
   const scrollareaViewportRef = useRef(null)
 
+  const [playing, setPlaying] = useState(false)
+
   const [currentBtcData, setCurrentBtcData] = useState(null)
 
   const [buyPrice, setBuyPrice] = useState(100)
@@ -45,44 +48,46 @@ export default function Home() {
 
   const [transactionHistory, transactionHistoryHandler] = useListState([])
 
-  const interval = useInterval(() => {
-    async function fetchPosts() {
-      let res = await fetch('/api/hello')
-      let btcData = await res.json()
-      if (btcData.time === null) return
+  useInterval(
+    () => {
+      async function fetchPosts() {
+        let res = await fetch('/api/hello')
+        let btcData = await res.json()
+        if (btcData.time === null) return
 
-      setCurrentBtcData(btcData)
+        setCurrentBtcData(btcData)
 
-      const data = { x: Date.now(), y: btcData.close }
-      ref?.current.data.datasets[0].data.push(data)
-      ref?.current.update('quiet')
-      
-      const lastTransaction = transactionHistory[0]
+        const data = { x: Date.now(), y: btcData.close }
+        ref?.current.data.datasets[0].data.push(data)
+        ref?.current.update('quiet')
 
-      if (
-        boughtIn && stopLossEnabled &&
-        stopLoss / 100 <=
-          (lastTransaction.btcPrice - currentBtcData.close) /
-            lastTransaction.btcPrice
-      ) {
-        sellOut()
-      } 
-      if (
-        boughtIn && takeProfitEnabled &&
-        takeProfit / 100 <=
-          -(lastTransaction.btcPrice - currentBtcData.close) /
-            lastTransaction.btcPrice
-      ) {
-        sellOut()
+        const lastTransaction = transactionHistory[0]
+
+        if (
+          boughtIn &&
+          stopLossEnabled &&
+          stopLoss / 100 <=
+            (lastTransaction.btcPrice - currentBtcData.close) /
+              lastTransaction.btcPrice
+        ) {
+          sellOut()
+        }
+        if (
+          boughtIn &&
+          takeProfitEnabled &&
+          takeProfit / 100 <=
+            -(lastTransaction.btcPrice - currentBtcData.close) /
+              lastTransaction.btcPrice
+        ) {
+          sellOut()
+        }
       }
-    }
-    fetchPosts()
-  }, 100)
 
-  useEffect(() => {
-    interval.start()
-    return interval.stop
-  }, [])
+      fetchPosts()
+    },
+    100,
+    { autoInvoke: true }
+  )
 
   useEffect(() => {
     scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -113,55 +118,61 @@ export default function Home() {
   }, [currentBal])
 
   useEffect(() => {
-    delete ref.current.config.options.plugins.annotation.annotations['stopLossLine']
-    delete ref.current.config.options.plugins.annotation.annotations['takeProfitLine']
-    if (!boughtIn) { 
-      ref.current.update("quiet")
+    delete ref.current.config.options.plugins.annotation.annotations[
+      'stopLossLine'
+    ]
+    delete ref.current.config.options.plugins.annotation.annotations[
+      'takeProfitLine'
+    ]
+    if (!boughtIn) {
+      ref.current.update('quiet')
       return
     }
 
-    if (stopLossEnabled){
+    if (stopLossEnabled) {
       const stopLossLine = {
         drawTime: 'afterDatasetsDraw',
         type: 'line',
         scaleID: 'y',
-        borderDash: [10,5],
-        value: transactionHistory[0].btcPrice * (1-(stopLoss/100)),
+        borderDash: [10, 5],
+        value: transactionHistory[0].btcPrice * (1 - stopLoss / 100),
         borderColor: '#fafafa',
         borderWidth: 2,
         label: {
-          backgroundColor: '#fafafa',
+          backgroundColor: '#3a3a3a',
           content: `Stop Loss: ${stopLoss}%`,
           display: true,
           position: 'start',
         },
       }
-      ref.current.config.options.plugins.annotation.annotations['stopLossLine'] = stopLossLine
+      ref.current.config.options.plugins.annotation.annotations[
+        'stopLossLine'
+      ] = stopLossLine
     }
 
-    if (takeProfitEnabled){
+    if (takeProfitEnabled) {
       const takeProfitLine = {
         drawTime: 'afterDatasetsDraw',
         type: 'line',
         scaleID: 'y',
-        borderDash: [10,5],
-        value: transactionHistory[0].btcPrice * (1+(takeProfit/100)),
+        borderDash: [10, 5],
+        value: transactionHistory[0].btcPrice * (1 + takeProfit / 100),
         borderColor: '#fafafa',
         borderWidth: 2,
         label: {
-          backgroundColor: '#fafafa',
+          backgroundColor: '#3a3a3a',
           content: `Take Profit: ${stopLoss}%`,
           display: true,
           position: 'start',
         },
       }
-      ref.current.config.options.plugins.annotation.annotations['takeProfitLine'] = takeProfitLine
+      ref.current.config.options.plugins.annotation.annotations[
+        'takeProfitLine'
+      ] = takeProfitLine
     }
 
-    ref.current.update("quiet")
-  
+    ref.current.update('quiet')
   }, [boughtIn, stopLoss, stopLossEnabled, takeProfit, takeProfitEnabled])
-
 
   function buyIn() {
     if (currentBtcData === null) return
@@ -198,7 +209,7 @@ export default function Home() {
     delete ref.current.config.options.plugins.annotation.annotations['sellLine']
     ref.current.config.options.plugins.annotation.annotations['buyLine'] = line
     ref?.current.update('quiet')
-    
+
     setCurrentBal(currentBal - buyPrice)
     setBuyPrice(100)
   }
@@ -256,7 +267,24 @@ export default function Home() {
   return (
     <div className='flex p-4'>
       <div className='flex flex-row w-full space-x-4'>
-        <div className='flex flex-col w-full space-y-8'>
+        <div className='flex flex-col w-full space-y-8 relative'>
+          {!playing && (
+            <Overlay color='#000' backgroundOpacity={0.35} blur={15}>
+              <div className='w-1/3 h-full mx-auto text-center flex flex-col items-center justify-center space-y-8'>
+                <p>
+                  Get ready to buy low and sell high! You will have 60 seconds
+                  to make as much profit as you can to add to your total on the
+                  global leaderboard and grow our money tree.
+                </p>
+                <Button
+                  onClick={() => setPlaying(true)}
+                  className='w-32 text-xl'
+                >
+                  Play
+                </Button>
+              </div>
+            </Overlay>
+          )}
           <Modal
             opened={opened}
             overlayProps={{
@@ -365,7 +393,6 @@ export default function Home() {
               </Paper>
             </div>
 
-
             <div className='flex flex-col gap-y-4 !ml-auto w-2/5'>
               <ScrollArea h={400} viewportRef={scrollareaViewportRef}>
                 <Table>
@@ -428,30 +455,30 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
         <Divider orientation='vertical' color='darkgray' />
 
         <div className='w-1/3'>
-          <Tabs defaultValue="leaderboard" color="dark">
-            <Tabs.List>
-              <Tabs.Tab value="leaderboard" className="hover:bg-slate-800">
+          <Tabs defaultValue='leaderboard' color='dark'>
+            <Tabs.List grow>
+              <Tabs.Tab value='leaderboard' className='hover:bg-slate-800'>
                 Leaderboard
               </Tabs.Tab>
-              <Tabs.Tab value="tree" className="hover:bg-slate-800">
+              <Tabs.Tab value='tree' className='hover:bg-slate-800'>
                 Tree
               </Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="leaderboard">
+            <Tabs.Panel value='leaderboard'>
               <Leaderboard />
             </Tabs.Panel>
-            <Tabs.Panel value="tree">
-              <div className="pt-4">
+            <Tabs.Panel value='tree'>
+              <div className='pt-4'>
                 <Bonsai />
               </div>
             </Tabs.Panel>
           </Tabs>
-        </div> 
+        </div>
       </div>
     </div>
   )
