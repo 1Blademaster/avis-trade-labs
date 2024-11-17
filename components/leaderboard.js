@@ -37,6 +37,15 @@ export default function Leaderboard() {
     let leaderboard = await res.json();
     console.log("Leaderboard: "+ leaderboard[0].username);
     setLeaderboard(leaderboard);
+
+    fetch('/api/leaderboard/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({user_id: leaderboard[0].user_id, profit: 100}),
+      })
+
   }
 
   useEffect(() => {
