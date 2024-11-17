@@ -1,5 +1,5 @@
 import { Table } from '@mantine/core'
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 const users = [
   { id: 1, username: 'Kush', totalProfit: 143663 },
@@ -29,24 +29,41 @@ const users = [
 ].sort((a, b) => b.totalProfit - a.totalProfit)
 
 export default function Leaderboard() {
-
-  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [leaderboardData, setLeaderboardData] = useState([])
 
   useEffect(() => {
     const getLeaderboardData = async () => {
-
-      let res = await fetch('/api/leaderboard/get');
-      let tempLeaderboard = await res.json();
-      setLeaderboardData(tempLeaderboard);
+      let res = await fetch('/api/leaderboard/get')
+      let tempLeaderboard = await res.json()
+      setLeaderboardData(tempLeaderboard)
     }
-    getLeaderboardData();
+    getLeaderboardData()
   }, [])
 
-  function formatProfit(profit){
-    return profit ? (profit < 0 ? "-£" + Math.abs(profit) : "£" + profit) : "";
+  function formatProfit(profit) {
+    return profit ? (profit < 0 ? '-£' + Math.abs(profit) : '£' + profit) : ''
   }
 
-  const rowsDisplayed = 20;
+  const rowsDisplayed = 20
+  const rows = users.slice(0, rowsDisplayed).map((user, idx) => {
+    var podiumClassName = ''
+
+    if (idx === 0) {
+      podiumClassName = 'bg-amber-300/50'
+    } else if (idx === 1) {
+      podiumClassName = 'bg-green-300/50'
+    } else if (idx === 2) {
+      podiumClassName = 'bg-blue-300/50'
+    }
+
+    return (
+      <Table.Tr key={user._id} className={podiumClassName}>
+        <Table.Td>{idx + 1}</Table.Td>
+        <Table.Td>{user.username}</Table.Td>
+        <Table.Td>{user.profit}</Table.Td>
+      </Table.Tr>
+    )
+  })
 
   return (
     <Table>
@@ -58,7 +75,14 @@ export default function Leaderboard() {
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {[...leaderboardData, ...(Array(rowsDisplayed - leaderboardData.length).fill({username: '', _id: '', profit: ''}))].map((user, idx) => {
+        {[
+          ...leaderboardData,
+          ...Array(rowsDisplayed - leaderboardData.length).fill({
+            username: '',
+            _id: '',
+            profit: '',
+          }),
+        ].map((user, idx) => {
           var podiumClassName = ''
 
           if (idx === 0) {
@@ -73,11 +97,12 @@ export default function Leaderboard() {
             <Table.Tr key={`tr${idx}`} className={podiumClassName}>
               <Table.Td key={`idx${idx}`}>{idx + 1}</Table.Td>
               <Table.Td key={`username${idx}`}>{user.username}</Table.Td>
-              <Table.Td key={`profit${idx}`}>{formatProfit(user.profit)}</Table.Td>
+              <Table.Td key={`profit${idx}`}>
+                {formatProfit(user.profit)}
+              </Table.Td>
             </Table.Tr>
           )
         })}
-
       </Table.Tbody>
     </Table>
   )
