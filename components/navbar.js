@@ -26,7 +26,6 @@ export default function Navbar() {
       setUserData(user);
     }
     getUserData();
-    close();
   }, [user])
 
   return (

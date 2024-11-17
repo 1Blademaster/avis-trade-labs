@@ -1,4 +1,5 @@
 import { Table } from '@mantine/core'
+import { useEffect, useState } from 'react';
 
 const users = [
   { id: 1, username: 'Kush', totalProfit: 143663 },
@@ -28,8 +29,22 @@ const users = [
 ].sort((a, b) => b.totalProfit - a.totalProfit)
 
 export default function Leaderboard() {
-  const rowsDisplayed = 20
+
+  const [leaderboardData, setLeaderboardData] = useState([]);
+
+  useEffect(() => {
+    const getLeaderboardData = async () => {
+
+      let res = await fetch('/api/leaderboard/get');
+      let tempLeaderboard = await res.json();
+      setLeaderboardData(tempLeaderboard);
+    }
+    getLeaderboardData();
+  }, [])
+
+  const rowsDisplayed = 20;
   const rows = users.slice(0, rowsDisplayed).map((user, idx) => {
+    console.log(user);
     var podiumClassName = ''
 
     if (idx === 0) {
@@ -41,10 +56,10 @@ export default function Leaderboard() {
     }
 
     return (
-      <Table.Tr key={user.id} className={podiumClassName}>
+      <Table.Tr key={user._id} className={podiumClassName}>
         <Table.Td>{idx + 1}</Table.Td>
         <Table.Td>{user.username}</Table.Td>
-        <Table.Td>${user.totalProfit}</Table.Td>
+        <Table.Td>{user.profit}</Table.Td>
       </Table.Tr>
     )
   })
