@@ -51,7 +51,7 @@ export default function Practice() {
         padding='lg'
         radius='md'
         withborder={true}
-        className='bg-slate-800 w-96'
+        className='bg-slate-800 w-[26rem]'
         key={card.title}
       >
         <Group position='apart' mt='md' mb='xs'>
@@ -119,7 +119,7 @@ export default function Practice() {
         </div>
       </Overlay>
 
-      <div className='h-screen overflow-x-hidden'>
+      <div className='my-20 w-full overflow-x-hidden'>
         <div className='flex h-[90%] items-center justify-center gap-x-8 w-screen'>
           {cards}
         </div>
