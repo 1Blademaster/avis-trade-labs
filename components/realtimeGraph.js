@@ -84,7 +84,7 @@ const RealtimeGraph = forwardRef(function RealtimeGraph({ datasetLabel }, ref) {
   }, [datasetLabel])
 
   return (
-    <div className='rounded-lg w-full h-full'>
+    <div className='rounded-lg w-full h-full bg-slate-800 p-4'>
       <Scatter ref={ref} options={options} data={chartData} />
     </div>
   )

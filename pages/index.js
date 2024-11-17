@@ -14,6 +14,7 @@ import {
   ScrollArea,
   Stack,
   Table,
+  Tabs,
   Tooltip,
 } from '@mantine/core'
 import { useDisclosure, useInterval, useListState } from '@mantine/hooks'
@@ -300,6 +301,7 @@ export default function Home() {
                     className='w-full'
                     onClick={buyIn}
                     disabled={currentBal < buyPrice || boughtIn}
+                    autoContrast
                   >
                     BUY
                   </Button>
@@ -309,6 +311,7 @@ export default function Home() {
                     className='w-full'
                     onClick={sellOut}
                     disabled={!boughtIn}
+                    autoContrast
                   >
                     SELL
                   </Button>
@@ -362,12 +365,9 @@ export default function Home() {
               </Paper>
             </div>
 
-            <div>
-              <Bonsai></Bonsai>
-            </div>
 
-            <div className='flex flex-col gap-y-4 !ml-auto w-11/12'>
-              <ScrollArea h={200} viewportRef={scrollareaViewportRef}>
+            <div className='flex flex-col gap-y-4 !ml-auto w-2/5'>
+              <ScrollArea h={400} viewportRef={scrollareaViewportRef}>
                 <Table>
                   <Table.Thead>
                     <Table.Tr>
@@ -428,10 +428,30 @@ export default function Home() {
             </div>
           </div>
         </div>
+        
         <Divider orientation='vertical' color='darkgray' />
+
         <div className='w-1/3'>
-          <Leaderboard />
-        </div>
+          <Tabs defaultValue="leaderboard" color="dark">
+            <Tabs.List>
+              <Tabs.Tab value="leaderboard" className="hover:bg-slate-800">
+                Leaderboard
+              </Tabs.Tab>
+              <Tabs.Tab value="tree" className="hover:bg-slate-800">
+                Tree
+              </Tabs.Tab>
+            </Tabs.List>
+
+            <Tabs.Panel value="leaderboard">
+              <Leaderboard />
+            </Tabs.Panel>
+            <Tabs.Panel value="tree">
+              <div className="pt-4">
+                <Bonsai />
+              </div>
+            </Tabs.Panel>
+          </Tabs>
+        </div> 
       </div>
     </div>
   )
