@@ -286,8 +286,9 @@ export default function Home() {
             <Overlay color='#000' backgroundOpacity={0.35} blur={15}>
               <div className='w-1/3 h-full mx-auto text-center flex flex-col items-center justify-center space-y-8'>
                 <p>
-                  Get ready to buy low and sell high! Make as much profit as you can to add to your total on the
-                  global leaderboard and grow our money tree.
+                  Get ready to buy low and sell high! Make as much profit as you
+                  can to add to your total on the global leaderboard and grow
+                  our money tree.
                 </p>
                 <Button
                   onClick={() => setPlaying(true)}
@@ -342,6 +343,7 @@ export default function Home() {
                         className='w-full'
                         onClick={() => setBuyPrice(currentBal / 2)}
                         autoContrast
+                        size='compact-sm'
                       >
                         1/2
                       </Button>
@@ -350,6 +352,7 @@ export default function Home() {
                         className='w-full'
                         onClick={() => setBuyPrice(currentBal)}
                         autoContrast
+                        size='compact-sm'
                       >
                         MAX
                       </Button>
@@ -402,6 +405,7 @@ export default function Home() {
                     allowNegative={false}
                     disabled={!takeProfitEnabled}
                     hideControls
+                    className='w-full'
                   />
                 </div>
               </Paper>
@@ -425,6 +429,7 @@ export default function Home() {
                     disabled={!stopLossEnabled}
                     allowNegative={false}
                     hideControls
+                    className='w-full'
                   />
                 </div>
               </Paper>
@@ -507,7 +512,7 @@ export default function Home() {
             </Tabs.List>
 
             <Tabs.Panel value='leaderboard'>
-              <Leaderboard />
+              <Leaderboard username={user?.username} />
             </Tabs.Panel>
             <Tabs.Panel value='tree'>
               <div className='pt-4'>

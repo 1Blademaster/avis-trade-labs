@@ -1,7 +1,7 @@
 import { Table } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-export default function Leaderboard() {
+export default function Leaderboard({ username }) {
   const [leaderboardData, setLeaderboardData] = useState([])
 
   useEffect(() => {
@@ -49,6 +49,10 @@ export default function Leaderboard() {
             podiumClassName = 'bg-green-300/50'
           } else if (idx === 2) {
             podiumClassName = 'bg-blue-300/50'
+          }
+
+          if (user.username === username) {
+            podiumClassName += ' font-bold text-lime-400'
           }
 
           return (
