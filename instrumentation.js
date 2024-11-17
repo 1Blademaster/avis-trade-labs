@@ -32,12 +32,6 @@ function loopThroughFiles(currentFileIndex) {
     })
 }
 
-global.current = 0
-if (global.interval !== null || global.interval !== undefined) {
-  clearInterval(global.interval)
-}
-global.interval = null
-
 function main() {
   loopThroughFiles(0)
   clearInterval(global.interval)
@@ -54,6 +48,12 @@ function main() {
 }
 
 export function register() {
+  global.current = 0
+  if (global.interval !== null || global.interval !== undefined) {
+    clearInterval(global.interval)
+  }
+  global.interval = null
+
   if (global.current === 0) {
     console.log(global.current)
     main()
