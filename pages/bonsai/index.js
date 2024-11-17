@@ -5,33 +5,56 @@ const up = 0;
 const right = 45;
 const left = -45;
 
-const mathConfig = {
-  randomSeed: 50933431.171054244,
-};
-const math = create(all, mathConfig);
-
 export default function Bonsai() {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
   const lineLength = 20;
-  const treeHeight = 25;
   const gap = 7.5;
   const startingPoint = [centerX, height];
+  let treeHeight = 25;
+  let ctx;
+  let points;
+  let references;
+  let math;
 
-  let points = [
-    // direction, referenceLabel, isGLowing, label
-    // Starting row
-    [up, -1, true, "0r0"],
-    [left, "0r0", true, "1r0"],
-    [right, "0r0", true, "1r1"],
-  ];
-  let references = {
-    // label: [xStart, xEnd, yStart, yEnd, touching]
-    "0r0": [960, 960, 1070, 1010, false],
-    "1r0": [950, 900, 1000, 940, false],
-    "1r1": [970, 1020, 1000, 940, false],
-  };
+  function generateNextLayer() {
+    ctx.clearRect(0, 0, width, height);
+    treeHeight += 1;
+    initDraw();
+  }
+
+  function deleteLastLayer() {
+    ctx.clearRect(0, 0, width, height);
+    treeHeight -= 1;
+    initDraw();
+  }
+
+  function resetMaths() {
+    const mathConfig = {
+      randomSeed: 50933431.171054244,
+    };
+    math = create(all, mathConfig);
+  }
+
+  function resetPoints() {
+    points = [
+      // direction, referenceLabel, isGLowing, label
+      // Starting row
+      [up, -1, true, "0r0"],
+      [left, "0r0", true, "1r0"],
+      [right, "0r0", true, "1r1"],
+    ];
+  }
+
+  function resetReferences() {
+    references = {
+      // label: [xStart, xEnd, yStart, yEnd, touching]
+      "0r0": [960, 960, 1070, 1010, false],
+      "1r0": [950, 900, 1000, 940, false],
+      "1r1": [970, 1020, 1000, 940, false],
+    };
+  }
 
   function generateLines(ctx, maxHeight) {
     let validDirections = [up, left, right];
@@ -46,9 +69,9 @@ export default function Bonsai() {
         x.startsWith(`${previousRow}r`)
       );
 
-      console.log(references);
+      console.debug(references);
 
-      console.log("Starting with previous row of " + previousRow);
+      console.debug("Starting with previous row of " + previousRow);
       let branchId = 0;
       previousKeys.forEach((key) => {
         validDirections.forEach((direction) => {
@@ -64,7 +87,7 @@ export default function Bonsai() {
           );
 
           if (canDraw && math.random() >= 0.45) {
-            console.log(
+            console.debug(
               "Drawing branch of label " +
                 `${currentRow}r${branchId} from ${key}`
             );
@@ -148,7 +171,7 @@ export default function Bonsai() {
         ) &&
         label != Object.keys(references)[i]
       ) {
-        console.log(
+        console.debug(
           "Skipping line " +
             label +
             " as it will cross with " +
@@ -161,9 +184,12 @@ export default function Bonsai() {
     return [true, xStart, xEnd, yStart, yEnd];
   }
 
-  useEffect(() => {
-    const canvas = document.getElementById("bonsai-canvas");
-    const ctx = canvas.getContext("2d");
+  function initDraw() {
+    resetMaths();
+    resetPoints();
+    resetReferences();
+
+    console.log(points, references);
 
     points.forEach((point) => {
       // Get variables from point
@@ -205,15 +231,25 @@ export default function Bonsai() {
     });
 
     generateLines(ctx, treeHeight);
+  }
+
+  useEffect(() => {
+    const canvas = document.getElementById("bonsai-canvas");
+    ctx = canvas.getContext("2d");
+    initDraw();
   }, []);
 
   return (
-    <canvas
-      className="w-screen h-screen bg-neutral-800"
-      id="bonsai-canvas"
-      width={width}
-      height={height}
-    ></canvas>
+    <>
+      <button onClick={() => generateNextLayer()}>Bruh</button>
+      <button onClick={() => deleteLastLayer()}>WHAT!</button>
+      <canvas
+        className="w-64 h-64"
+        id="bonsai-canvas"
+        width={width}
+        height={height}
+      ></canvas>
+    </>
   );
 }
 
