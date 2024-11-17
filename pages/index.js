@@ -1,6 +1,6 @@
 import Leaderboard from '@/components/leaderboard'
 import RealtimeGraph from '@/components/realtimeGraph'
-import { Button, ButtonGroup, NumberInput, ScrollArea, Modal, Stack, NumberInput, ScrollArea } from '@mantine/core'
+import { Button, ButtonGroup, NumberInput, ScrollArea, Modal, Stack, Divider } from '@mantine/core'
 import { useInterval, useListState, useDisclosure } from '@mantine/hooks'
 
 import Link from 'next/link'
@@ -45,7 +45,6 @@ export default function Home() {
   const [takeProfit, setTakeProfit] = useState(20)
 
   const {user, error, isLoading } = useUser();
-  console.log(user);
   const [opened, {open, close}] = useDisclosure(REQUIRE_LOGIN && !user);
   
   const [transactionHistory, transactionHistoryHandler] = useListState([])
