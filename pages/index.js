@@ -5,9 +5,11 @@ import {
   ButtonGroup,
   Checkbox,
   Divider,
+  Modal,
   NumberInput,
   Paper,
   ScrollArea,
+  Stack,
   Table,
   Tooltip,
 } from '@mantine/core'
@@ -15,7 +17,8 @@ import { useDisclosure, useInterval, useListState } from '@mantine/hooks'
 import { useEffect, useRef, useState } from 'react'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../tailwind.config.js'
-import { useUser } from '@auth0/nextjs-auth0/client.js'
+import { useUser } from '@auth0/nextjs-auth0/client'
+import Link from 'next/link.js'
 
 const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
@@ -177,6 +180,27 @@ export default function Home() {
     <div className='flex p-4'>
       <div className='flex flex-row w-full space-x-4'>
         <div className='flex flex-col w-full space-y-8'>
+        <Modal 
+            opened={opened} 
+            overlayProps={{
+                backgroundOpacity: 0.3,
+                blur: 3
+            }}
+            styles={{
+                header: {backgroundColor: '#2d2d2d'},
+                content: {backgroundColor: '#2d2d2d'}
+            }}
+            centered
+            onClose={user ? close : () => {}}
+            withCloseButton={false}
+          >
+            <Stack align='center'>
+              You must be logged to play.
+              <Button component={Link} href='/api/auth/login' w={"33%"}>
+                Login
+              </Button>
+            </Stack>
+          </Modal>
           <div className='h-3/4'>
             <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
           </div>
