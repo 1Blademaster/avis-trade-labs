@@ -1,4 +1,4 @@
-import Bonsai from '@/components/bonsai.js'
+import { Bonsai } from '@/components/bonsai.js'
 import Leaderboard from '@/components/leaderboard'
 import RealtimeGraph from '@/components/realtimeGraph'
 
@@ -296,7 +296,7 @@ export default function Home() {
                 <ButtonGroup className='w-full'>
                   <Button
                     variant='filled'
-                    color='#a3e635'
+                    color='#2ae841'
                     className='w-full'
                     onClick={buyIn}
                     disabled={currentBal < buyPrice || boughtIn}
@@ -320,7 +320,7 @@ export default function Home() {
                 <div className='flex flex-row items-center space-x-2'>
                   <Tooltip label='Take Profit'>
                     <Checkbox
-                      color='lime'
+                      color='#2ae841'
                       checked={takeProfitEnabled}
                       onChange={(e) =>
                         setTakeProfitEnabled(e.currentTarget.checked)
@@ -343,7 +343,7 @@ export default function Home() {
                 <div className='flex flex-row items-center space-x-2'>
                   <Tooltip label='Stop Loss'>
                     <Checkbox
-                      color='#a3e635'
+                      color='#2ae841'
                       checked={stopLossEnabled}
                       onChange={(e) =>
                         setStopLossEnabled(e.currentTarget.checked)

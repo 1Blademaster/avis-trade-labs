@@ -1,4 +1,5 @@
 import { create, all } from "mathjs";
+import { memo } from "react";
 
 const up = 0;
 const right = 45;
@@ -6,7 +7,7 @@ const left = -45;
 const green = "#2ae841";
 const red = "red";
 
-export default function Bonsai() {
+export const Bonsai = memo(function Bonsai({}) {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
@@ -23,9 +24,13 @@ export default function Bonsai() {
   let references;
   let math;
 
-  function newGraph() {
+  function getContext() {
     const canvas = document.getElementById("bonsai-canvas");
     ctx = canvas.getContext("2d");
+  }
+
+  function newGraph() {
+    getContext();
     initDraw();
     generateLines(ctx, treeHeight);
   }
@@ -333,7 +338,7 @@ export default function Bonsai() {
       ></canvas>
     </>
   );
-}
+});
 
 function willCross(p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y) {
   let d1x = p1x - p0x;
