@@ -7,7 +7,7 @@ const valueOffset = -(427500 / 100)
 global.data = []
 const maxDataLength = 4_500_000
 
-const fileNames = ['../../public/combed.csv']
+const fileNames = ['/var/task/.next/server/public/combed.csv']
 
 function loopThroughFiles(currentFileIndex) {
   console.log(__dirname)
