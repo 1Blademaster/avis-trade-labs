@@ -3,6 +3,8 @@ import { create, all } from "mathjs";
 const up = 0;
 const right = 45;
 const left = -45;
+const green = "#2ae841";
+const red = "red";
 
 export default function Bonsai() {
   const width = 1920;
@@ -11,6 +13,7 @@ export default function Bonsai() {
   const gap = 2;
   const startingPoint = [centerX, height];
   let lastBranchId = "3r-1";
+  let treeColor = green;
   let lineWidth = 20;
   let lineLength = 5;
   let treeHeight = 3;
@@ -31,6 +34,7 @@ export default function Bonsai() {
     ctx.clearRect(0, 0, width, height);
     initDraw();
 
+    treeColor = green;
     let [failedLine, failedOn] = generateLines(ctx, treeHeight);
     if (lastBranchId == failedOn) {
       treeHeight += 1;
@@ -50,6 +54,7 @@ export default function Bonsai() {
   function deleteLastBranch() {
     ctx.clearRect(0, 0, width, height);
 
+    treeColor = red;
     let splitBranch = lastBranchId.split("r");
     if (splitBranch[0] > 2) {
       if (splitBranch[1] == 0) {
@@ -95,7 +100,7 @@ export default function Bonsai() {
   }
 
   function updateLineHeight() {
-    lineLength = Math.round((height - 500) / treeHeight);
+    lineLength = Math.round((height - lineLength - 100) / treeHeight);
   }
 
   function resetMaths() {
@@ -133,7 +138,7 @@ export default function Bonsai() {
     // ctx.shadowBlur = highlighted ? 2 * lineWidth : 0;
     ctx.lineCap = "round";
     // ctx.shadowColor = "white";
-    ctx.strokeStyle = highlighted ? "#2ae841" : "gray";
+    ctx.strokeStyle = highlighted ? treeColor : "gray";
     ctx.stroke();
   }
 
