@@ -291,7 +291,7 @@ export default function Home() {
               <Bonsai></Bonsai>
             </div>
 
-            <div className="flex flex-col gap-y-4 !ml-auto w-4/5">
+            <div className="flex flex-col gap-y-4 !ml-auto w-11/12">
               <p className="text-3xl font-bold">
                 Balance: ${currentBal.toFixed(2)}
               </p>
