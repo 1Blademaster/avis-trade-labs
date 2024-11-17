@@ -1,52 +1,30 @@
 import { useEffect } from "react";
+import { create, all } from "mathjs";
 
 const up = 0;
 const right = 45;
 const left = -45;
 
+const mathConfig = {
+  randomSeed: 50933431.171054244,
+};
+const math = create(all, mathConfig);
+
 export default function Bonsai() {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
-  const lineLength = 35;
-  const gap = 10;
+  const lineLength = 20;
+  const treeHeight = 25;
+  const gap = 7.5;
   const startingPoint = [centerX, height];
-
-  // let points = [
-  //   // Starting row
-  //   [up, -1, true, "s"],
-  //   [left, "s", false, "s1"],
-  //   [right, "s", false, "s2"],
-  //   // 2nd row
-  //   [left, "s1", false, "2r1"],
-  //   [right, "s1", false, "2r2"],
-  //   [up, "s2", false, "2r3"],
-  //   // 3rd row
-  //   [left, "2r1", false, "3r1"],
-  //   [right, "2r1", false, "3r2"],
-  //   [up, "2r2", false, "3r3"],
-  //   [right, "2r3", false, "3r4"],
-  //   // 4th row
-  //   [right, "3r1", false, "4r1", true],
-  //   [left, "3r2", false, "4r2", true],
-  //   [right, "3r2", false, "4r3"],
-  //   [right, "3r3", false, "4r4", true],
-  //   [left, "3r4", false, "4r5", true],
-  //   [right, "3r4", false, "4r6"],
-  //   // 5th row
-  //   [up, "4r2", false, "5r1"],
-  //   [left, "4r3", false, "5r2"],
-  //   [right, "4r3", false, "5r3"],
-  // ];
-
-  // let references = {};
 
   let points = [
     // direction, referenceLabel, isGLowing, label
     // Starting row
     [up, -1, true, "0r0"],
-    [left, "0r0", false, "1r0"],
-    [right, "0r0", false, "1r1"],
+    [left, "0r0", true, "1r0"],
+    [right, "0r0", true, "1r1"],
   ];
   let references = {
     // label: [xStart, xEnd, yStart, yEnd, touching]
@@ -58,6 +36,7 @@ export default function Bonsai() {
   function generateLines(ctx, maxHeight) {
     let validDirections = [up, left, right];
     let row = 2;
+    let angleVariance = 0;
 
     // Look at each branch that's on the row below, pick a valid branch and place it at random.
     // Tick up row and continue till max
@@ -72,42 +51,44 @@ export default function Bonsai() {
       console.log("Starting with previous row of " + previousRow);
       let branchId = 0;
       previousKeys.forEach((key) => {
-        if (Math.random() >= 0.1) {
-          validDirections.forEach((direction) => {
-            let [canDraw, xStart, xEnd, yStart, yEnd] = testPath(
-              direction,
-              key,
-              `${currentRow}r${branchId}`,
-              false
+        validDirections.forEach((direction) => {
+          let angle =
+            direction +
+            math.random() * angleVariance -
+            math.random() * angleVariance;
+          let [canDraw, xStart, xEnd, yStart, yEnd] = testPath(
+            angle,
+            key,
+            `${currentRow}r${branchId}`,
+            false
+          );
+
+          if (canDraw && math.random() >= 0.45) {
+            console.log(
+              "Drawing branch of label " +
+                `${currentRow}r${branchId} from ${key}`
             );
+            references[`${currentRow}r${branchId}`] = [
+              xStart,
+              xEnd,
+              yStart,
+              yEnd,
+              false,
+            ];
+            branchId++;
 
-            if (canDraw && Math.random() >= 0.3) {
-              console.log(
-                "Drawing branch of label " +
-                  `${currentRow}r${branchId} from ${key}`
-              );
-              references[`${currentRow}r${branchId}`] = [
-                xStart,
-                xEnd,
-                yStart,
-                yEnd,
-                false,
-              ];
-              branchId++;
-
-              // Draw line
-              ctx.beginPath();
-              ctx.moveTo(xStart, yStart);
-              ctx.lineTo(xEnd, yEnd);
-              ctx.lineWidth = 4;
-              ctx.shadowBlur = false ? 10 : 0;
-              ctx.lineCap = "round";
-              ctx.shadowColor = "blue";
-              ctx.strokeStyle = false ? "white" : "gray";
-              ctx.stroke();
-            }
-          });
-        }
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(xStart, yStart);
+            ctx.lineTo(xEnd, yEnd);
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = currentRow < 5 ? 10 : 0;
+            ctx.lineCap = "round";
+            ctx.shadowColor = "blue";
+            ctx.strokeStyle = currentRow < 5 ? "white" : "gray";
+            ctx.stroke();
+          }
+        });
       });
     }
   }
@@ -223,7 +204,7 @@ export default function Bonsai() {
       }
     });
 
-    generateLines(ctx, 15);
+    generateLines(ctx, treeHeight);
   }, []);
 
   return (
