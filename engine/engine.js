@@ -7,12 +7,10 @@ const valueOffset = -(427500 / 100)
 global.data = []
 const maxDataLength = 4_500_000
 
-const fileNames = [
-  'data/combed.csv',
-]
+const fileNames = ['data/combed.csv']
 
 function loopThroughFiles(currentFileIndex) {
-  fs.createReadStream(fileNames[currentFileIndex])
+  fs.createReadStream(`${__dirname}/${fileNames[currentFileIndex]}`)
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
