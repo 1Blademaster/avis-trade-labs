@@ -21,7 +21,7 @@ export default function Bonsai() {
   let references;
   let math;
 
-  function drawGraph() {
+  function newGraph() {
     const canvas = document.getElementById("bonsai-canvas");
     ctx = canvas.getContext("2d");
     initDraw();
@@ -321,7 +321,7 @@ export default function Bonsai() {
 
   return (
     <>
-      <button onClick={() => drawGraph()}>New</button>
+      <button onClick={() => newGraph()}>New</button>
       <button onClick={() => generateNextBranch()}>Add</button>
       <button onClick={() => deleteLastBranch()}>Remove</button>
       <canvas
