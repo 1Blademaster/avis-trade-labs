@@ -40,7 +40,7 @@ export default function Home() {
   const [currentBal, setCurrentBal] = useState(1000)
   const [boughtIn, setBoughtIn] = useState(false)
   
-  const REQUIRE_LOGIN = true; // false for dev
+  const REQUIRE_LOGIN = false; // false for dev
   const [stopLoss, setStopLoss] = useState(20)
   const [takeProfit, setTakeProfit] = useState(20)
 
