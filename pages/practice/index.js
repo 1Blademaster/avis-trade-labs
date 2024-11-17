@@ -52,6 +52,7 @@ export default function Practice() {
         radius="md"
         withborder={true}
         className="bg-slate-800 w-96"
+        key={card.title}
       >
         <Group position="apart" mt="md" mb="xs">
           <Text weight={500} className="text-white">
