@@ -31,6 +31,9 @@ function loopThroughFiles(currentFileIndex) {
 }
 
 global.current = 0
+if (global.interval !== null || global.interval !== undefined) {
+  clearInterval(global.interval)
+}
 global.interval = null
 
 export var btcData = {
@@ -40,6 +43,7 @@ export var btcData = {
 
 if (global.current === 0) {
   loopThroughFiles(0)
+  clearInterval(global.interval)
   global.interval = null
   global.data = []
   global.interval = setInterval(() => {

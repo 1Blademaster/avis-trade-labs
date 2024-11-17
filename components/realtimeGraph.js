@@ -6,7 +6,6 @@ import {
   PointElement,
   TimeScale,
   Title,
-  Tooltip,
 } from 'chart.js'
 import 'chartjs-adapter-moment'
 import Annotation from 'chartjs-plugin-annotation'
@@ -18,7 +17,6 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
-  Tooltip,
   ChartStreaming,
   Annotation
 )
@@ -61,7 +59,7 @@ const options = {
     },
     point: {
       radius: 0,
-      hitRadius: 10,
+      hitRadius: 0,
     },
   },
 }
