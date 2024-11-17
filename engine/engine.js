@@ -1,7 +1,7 @@
 const fs = require('fs')
 const csv = require('fast-csv')
 
-import dt from '../../public/combed.csv'
+import dt from '../public/combed.csv'
 
 const varianceMultiplier = 25
 const valueOffset = -(427500 / 100)
