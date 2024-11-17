@@ -9,7 +9,7 @@ const valueOffset = -(427500 / 100)
 global.data = []
 const maxDataLength = 4_500_000
 
-const fileNames = [path.join(process.cwd(), 'combed.csv')]
+const fileNames = [path.join(process.cwd(), 'public/combed.csv')]
 
 function loopThroughFiles(currentFileIndex) {
   console.log(__dirname, process.cwd(), path.join(process.cwd(), 'combed.csv'))
