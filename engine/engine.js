@@ -1,3 +1,5 @@
+import path from 'path'
+
 const fs = require('fs')
 const csv = require('fast-csv')
 
@@ -7,10 +9,10 @@ const valueOffset = -(427500 / 100)
 global.data = []
 const maxDataLength = 4_500_000
 
-const fileNames = ['./public/combed.csv']
+const fileNames = ['/combed.csv']
 
 function loopThroughFiles(currentFileIndex) {
-  console.log(__dirname)
+  console.log(__dirname, process.cwd(), path.join(process.cwd(), 'combed.csv'))
   fs.createReadStream(fileNames[currentFileIndex])
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
