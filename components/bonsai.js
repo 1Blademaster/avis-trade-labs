@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { create, all } from "mathjs";
 
 const up = 0;
@@ -9,11 +8,11 @@ export default function Bonsai() {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
-  const gap = 7.5;
+  const gap = 2;
   const startingPoint = [centerX, height];
   let lastBranchId = "3r-1";
-  let lineWidth = 4;
-  let lineLength = 20;
+  let lineWidth = 20;
+  let lineLength = 5;
   let treeHeight = 3;
   let firstTimeSkip = true;
   let ctx;
@@ -125,6 +124,19 @@ export default function Bonsai() {
     };
   }
 
+  function renderLine(xStart, xEnd, yStart, yEnd, highlighted) {
+    // Draw line
+    ctx.beginPath();
+    ctx.moveTo(xStart, yStart);
+    ctx.lineTo(xEnd, yEnd);
+    ctx.lineWidth = lineWidth;
+    // ctx.shadowBlur = highlighted ? 2 * lineWidth : 0;
+    ctx.lineCap = "round";
+    // ctx.shadowColor = "white";
+    ctx.strokeStyle = highlighted ? "#2ae841" : "gray";
+    ctx.stroke();
+  }
+
   function generateLines(ctx, maxHeight) {
     let validDirections = [up, left, right];
     let row = 2;
@@ -180,15 +192,7 @@ export default function Bonsai() {
               (currentRow == splitBranch[0] && branchId <= splitBranch[1])
             ) {
               // Draw line
-              ctx.beginPath();
-              ctx.moveTo(xStart, yStart);
-              ctx.lineTo(xEnd, yEnd);
-              ctx.lineWidth = 4;
-              ctx.shadowBlur = colourCondition ? 10 : 0;
-              ctx.lineCap = "round";
-              ctx.shadowColor = "blue";
-              ctx.strokeStyle = colourCondition ? "white" : "gray";
-              ctx.stroke();
+              renderLine(xStart, xEnd, yStart, yEnd, colourCondition);
 
               failedOn = `${currentRow}r${branchId}`;
               branchId++;
@@ -306,15 +310,7 @@ export default function Bonsai() {
         ];
 
         // Draw line
-        ctx.beginPath();
-        ctx.moveTo(xStart, yStart);
-        ctx.lineTo(xEnd, yEnd);
-        ctx.lineWidth = lineWidth;
-        ctx.shadowBlur = highlighted ? 2 * lineWidth : 0;
-        ctx.lineCap = "round";
-        ctx.shadowColor = "blue";
-        ctx.strokeStyle = highlighted ? "white" : "gray";
-        ctx.stroke();
+        renderLine(xStart, xEnd, yStart, yEnd, highlighted);
       }
     });
   }
@@ -325,7 +321,7 @@ export default function Bonsai() {
       <button onClick={() => generateNextBranch()}>Add</button>
       <button onClick={() => deleteLastBranch()}>Remove</button>
       <canvas
-        className="w-2/3 h-2/3"
+        className="w-4/5 h-min"
         id="bonsai-canvas"
         width={width}
         height={height}

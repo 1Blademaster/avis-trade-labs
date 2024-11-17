@@ -1,5 +1,6 @@
-import Leaderboard from '@/components/leaderboard'
-import RealtimeGraph from '@/components/realtimeGraph'
+import Bonsai from "@/components/bonsai.js";
+import Leaderboard from "@/components/leaderboard";
+import RealtimeGraph from "@/components/realtimeGraph";
 import {
   Button,
   ButtonGroup,
@@ -10,43 +11,43 @@ import {
   ScrollArea,
   Table,
   Tooltip,
-} from '@mantine/core'
-import { useInterval, useListState } from '@mantine/hooks'
-import { useEffect, useRef, useState } from 'react'
-import resolveConfig from 'tailwindcss/resolveConfig'
-import tailwindConfig from '../tailwind.config.js'
+} from "@mantine/core";
+import { useInterval, useListState } from "@mantine/hooks";
+import { useEffect, useRef, useState } from "react";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "../tailwind.config.js";
 
-const tailwindColors = resolveConfig(tailwindConfig).theme.colors
+const tailwindColors = resolveConfig(tailwindConfig).theme.colors;
 
 export default function Home() {
-  const ref = useRef(null)
-  const scrollareaViewportRef = useRef(null)
+  const ref = useRef(null);
+  const scrollareaViewportRef = useRef(null);
 
-  const [currentBtcData, setCurrentBtcData] = useState(null)
+  const [currentBtcData, setCurrentBtcData] = useState(null);
 
-  const [buyPrice, setBuyPrice] = useState(100)
-  const [currentBal, setCurrentBal] = useState(1000)
-  const [boughtIn, setBoughtIn] = useState(false)
-  const [stopLossEnabled, setStopLossEnabled] = useState(false)
-  const [takeProfitEnabled, setTakeProfitEnabled] = useState(false)
-  const [stopLoss, setStopLoss] = useState(20)
-  const [takeProfit, setTakeProfit] = useState(20)
+  const [buyPrice, setBuyPrice] = useState(100);
+  const [currentBal, setCurrentBal] = useState(1000);
+  const [boughtIn, setBoughtIn] = useState(false);
+  const [stopLossEnabled, setStopLossEnabled] = useState(false);
+  const [takeProfitEnabled, setTakeProfitEnabled] = useState(false);
+  const [stopLoss, setStopLoss] = useState(20);
+  const [takeProfit, setTakeProfit] = useState(20);
 
-  const [transactionHistory, transactionHistoryHandler] = useListState([])
+  const [transactionHistory, transactionHistoryHandler] = useListState([]);
 
   const interval = useInterval(() => {
     async function fetchPosts() {
-      let res = await fetch('/api/hello')
-      let btcData = await res.json()
-      if (btcData.time === null) return
+      let res = await fetch("/api/hello");
+      let btcData = await res.json();
+      if (btcData.time === null) return;
 
-      setCurrentBtcData(btcData)
+      setCurrentBtcData(btcData);
 
-      const data = { x: Date.now(), y: btcData.close }
-      ref?.current.data.datasets[0].data.push(data)
-      ref?.current.update('quiet')
+      const data = { x: Date.now(), y: btcData.close };
+      ref?.current.data.datasets[0].data.push(data);
+      ref?.current.update("quiet");
 
-      const lastTransaction = transactionHistory[0]
+      const lastTransaction = transactionHistory[0];
       if (
         boughtIn &&
         stopLossEnabled &&
@@ -54,7 +55,7 @@ export default function Home() {
           (lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
-        sellOut()
+        sellOut();
       }
       if (
         boughtIn &&
@@ -63,42 +64,42 @@ export default function Home() {
           -(lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
-        sellOut()
+        sellOut();
       }
     }
-    fetchPosts()
-  }, 100)
+    fetchPosts();
+  }, 100);
 
   useEffect(() => {
-    interval.start()
-    return interval.stop
-  }, [])
+    // interval.start();
+    return interval.stop;
+  }, []);
 
   useEffect(() => {
-    scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [transactionHistory])
+    scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [transactionHistory]);
 
   function buyIn() {
-    if (currentBtcData === null) return
+    if (currentBtcData === null) return;
 
-    setBoughtIn(true)
+    setBoughtIn(true);
 
-    const currentBtcClose = currentBtcData.close
+    const currentBtcClose = currentBtcData.close;
 
     const transaction = {
       id: crypto.randomUUID(),
-      type: 'buy',
+      type: "buy",
       btcPrice: currentBtcClose,
       buyPrice: buyPrice,
       time: new Date(),
-    }
+    };
 
-    transactionHistoryHandler.prepend(transaction)
+    transactionHistoryHandler.prepend(transaction);
 
     const line = {
-      drawTime: 'afterDatasetsDraw',
-      type: 'line',
-      scaleID: 'y',
+      drawTime: "afterDatasetsDraw",
+      type: "line",
+      scaleID: "y",
       value: currentBtcClose,
       borderColor: tailwindColors.lime[500],
       borderWidth: 2,
@@ -106,48 +107,48 @@ export default function Home() {
         backgroundColor: tailwindColors.lime[500],
         content: `BUY: $${currentBtcClose}`,
         display: true,
-        position: 'start',
+        position: "start",
       },
-    }
+    };
 
-    ref?.current.config.options.plugins.annotation.annotations.pop()
-    ref?.current.config.options.plugins.annotation.annotations.push(line)
-    ref?.current.update('quiet')
+    ref?.current.config.options.plugins.annotation.annotations.pop();
+    ref?.current.config.options.plugins.annotation.annotations.push(line);
+    ref?.current.update("quiet");
 
-    setCurrentBal(currentBal - buyPrice)
-    setBuyPrice(100)
+    setCurrentBal(currentBal - buyPrice);
+    setBuyPrice(100);
   }
 
   function sellOut() {
-    if (!boughtIn) return
+    if (!boughtIn) return;
 
-    setBoughtIn(false)
+    setBoughtIn(false);
 
-    const lastTransaction = transactionHistory[0]
+    const lastTransaction = transactionHistory[0];
 
-    const currentBtcClose = currentBtcData.close
+    const currentBtcClose = currentBtcData.close;
 
     const newBal =
       currentBal +
-      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice)
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice);
 
     const profit =
       currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice) -
-      lastTransaction.buyPrice
+      lastTransaction.buyPrice;
 
     const transaction = {
       id: crypto.randomUUID(),
-      type: 'sell',
+      type: "sell",
       btcPrice: currentBtcClose,
       buyPrice: lastTransaction.buyPrice,
       profit: profit,
       time: new Date(),
-    }
+    };
 
     const line = {
-      drawTime: 'afterDatasetsDraw',
-      type: 'line',
-      scaleID: 'y',
+      drawTime: "afterDatasetsDraw",
+      type: "line",
+      scaleID: "y",
       value: currentBtcClose,
       borderColor: tailwindColors.red[500],
       borderWidth: 2,
@@ -155,53 +156,53 @@ export default function Home() {
         backgroundColor: tailwindColors.red[500],
         content: `SELL: $${currentBtcClose}`,
         display: true,
-        position: 'start',
+        position: "start",
       },
-    }
+    };
 
-    transactionHistoryHandler.prepend(transaction)
+    transactionHistoryHandler.prepend(transaction);
 
-    ref?.current.config.options.plugins.annotation.annotations.pop()
-    ref?.current.config.options.plugins.annotation.annotations.push(line)
-    ref?.current.update('quiet')
+    ref?.current.config.options.plugins.annotation.annotations.pop();
+    ref?.current.config.options.plugins.annotation.annotations.push(line);
+    ref?.current.update("quiet");
 
-    setCurrentBal(newBal)
+    setCurrentBal(newBal);
   }
 
   return (
-    <div className='flex p-4'>
-      <div className='flex flex-row w-full space-x-4'>
-        <div className='flex flex-col w-full space-y-8'>
-          <div className='h-3/4'>
-            <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
+    <div className="flex p-4">
+      <div className="flex flex-row w-full space-x-4">
+        <div className="flex flex-col w-full space-y-8">
+          <div className="h-3/4">
+            <RealtimeGraph ref={ref} datasetLabel={"BTC"} />
           </div>
-          <div className='flex flex-row space-x-8'>
-            <div className='flex flex-col space-y-4 w-52'>
-              <Paper shadow='xs' p='sm' className='bg-slate-800'>
-                <p className='mb-2'>Buy Amount</p>
+          <div className="flex flex-row space-x-8">
+            <div className="flex flex-col space-y-4 w-52">
+              <Paper shadow="xs" p="sm" className="bg-slate-800">
+                <p className="mb-2">Buy Amount</p>
                 <NumberInput
-                  prefix='$'
+                  prefix="$"
                   value={buyPrice}
                   onChange={setBuyPrice}
                   allowNegative={false}
                   min={1}
                   hideControls
-                  className='mb-2'
+                  className="mb-2"
                 />
-                <ButtonGroup className='w-full'>
+                <ButtonGroup className="w-full">
                   <Button
-                    variant='filled'
-                    color='#a3e635'
-                    className='w-full'
+                    variant="filled"
+                    color="#a3e635"
+                    className="w-full"
                     onClick={buyIn}
                     disabled={currentBal < buyPrice || boughtIn}
                   >
                     BUY
                   </Button>
                   <Button
-                    variant='filled'
+                    variant="filled"
                     color={tailwindColors.red[500]}
-                    className='w-full'
+                    className="w-full"
                     onClick={sellOut}
                     disabled={!boughtIn}
                   >
@@ -210,12 +211,12 @@ export default function Home() {
                 </ButtonGroup>
               </Paper>
 
-              <Paper shadow='xs' p='sm' className='bg-slate-800'>
-                <p className='mb-2'>Take Profit</p>
-                <div className='flex flex-row space-x-2 items-center'>
-                  <Tooltip label='Take Profit'>
+              <Paper shadow="xs" p="sm" className="bg-slate-800">
+                <p className="mb-2">Take Profit</p>
+                <div className="flex flex-row items-center space-x-2">
+                  <Tooltip label="Take Profit">
                     <Checkbox
-                      color='lime'
+                      color="lime"
                       checked={takeProfitEnabled}
                       onChange={(e) =>
                         setTakeProfitEnabled(e.currentTarget.checked)
@@ -223,7 +224,7 @@ export default function Home() {
                     />
                   </Tooltip>
                   <NumberInput
-                    suffix='%'
+                    suffix="%"
                     value={takeProfit}
                     onChange={setTakeProfit}
                     allowNegative={false}
@@ -233,12 +234,12 @@ export default function Home() {
                 </div>
               </Paper>
 
-              <Paper shadow='xs' p='sm' className='bg-slate-800'>
-                <p className='mb-2'>Stop Loss</p>
-                <div className='flex flex-row space-x-2 items-center'>
-                  <Tooltip label='Stop Loss'>
+              <Paper shadow="xs" p="sm" className="bg-slate-800">
+                <p className="mb-2">Stop Loss</p>
+                <div className="flex flex-row items-center space-x-2">
+                  <Tooltip label="Stop Loss">
                     <Checkbox
-                      color='#a3e635'
+                      color="#a3e635"
                       checked={stopLossEnabled}
                       onChange={(e) =>
                         setStopLossEnabled(e.currentTarget.checked)
@@ -246,7 +247,7 @@ export default function Home() {
                     />
                   </Tooltip>
                   <NumberInput
-                    suffix='%'
+                    suffix="%"
                     value={stopLoss}
                     onChange={setStopLoss}
                     disabled={!stopLossEnabled}
@@ -256,76 +257,81 @@ export default function Home() {
                 </div>
               </Paper>
             </div>
-            <p className='font-bold text-3xl'>
-              Balance: ${currentBal.toFixed(2)}
-            </p>
-            <ScrollArea
-              h={200}
-              viewportRef={scrollareaViewportRef}
-              className='!ml-auto w-2/5'
-            >
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Time</Table.Th>
-                    <Table.Th>Type</Table.Th>
-                    <Table.Th>Buy price</Table.Th>
-                    <Table.Th>Amount</Table.Th>
-                    <Table.Th>Profit</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {transactionHistory.map((transaction) => {
-                    if (transaction.type === 'buy') {
-                      return (
-                        <Table.Tr
-                          key={transaction.id}
-                          className='bg-green-300/50'
-                        >
-                          <Table.Td>
-                            {new Date(transaction.time).toLocaleTimeString()}
-                          </Table.Td>
-                          <Table.Td>BUY</Table.Td>
-                          <Table.Td>
-                            ${transaction.btcPrice.toFixed(2)}
-                          </Table.Td>
-                          <Table.Td>
-                            ${transaction.buyPrice.toFixed(2)}
-                          </Table.Td>
-                          <Table.Td></Table.Td>
-                        </Table.Tr>
-                      )
-                    } else {
-                      return (
-                        <Table.Tr
-                          key={transaction.id}
-                          className='bg-red-300/50'
-                        >
-                          <Table.Td>
-                            {new Date(transaction.time).toLocaleTimeString()}
-                          </Table.Td>
-                          <Table.Td>SELL</Table.Td>
-                          <Table.Td>
-                            ${transaction.btcPrice.toFixed(2)}
-                          </Table.Td>
-                          <Table.Td>
-                            ${transaction.buyPrice.toFixed(2)}
-                          </Table.Td>
-                          <Table.Td>${transaction.profit.toFixed(2)}</Table.Td>
-                        </Table.Tr>
-                      )
-                    }
-                  })}
-                </Table.Tbody>
-              </Table>
-            </ScrollArea>
+
+            <div>
+              <Bonsai></Bonsai>
+            </div>
+
+            <div className="flex flex-col gap-y-4 !ml-auto w-4/5">
+              <p className="text-3xl font-bold">
+                Balance: ${currentBal.toFixed(2)}
+              </p>
+              <ScrollArea h={200} viewportRef={scrollareaViewportRef}>
+                <Table>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Time</Table.Th>
+                      <Table.Th>Type</Table.Th>
+                      <Table.Th>Buy price</Table.Th>
+                      <Table.Th>Amount</Table.Th>
+                      <Table.Th>Profit</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {transactionHistory.map((transaction) => {
+                      if (transaction.type === "buy") {
+                        return (
+                          <Table.Tr
+                            key={transaction.id}
+                            className="bg-[#2ae841]"
+                          >
+                            <Table.Td>
+                              {new Date(transaction.time).toLocaleTimeString()}
+                            </Table.Td>
+                            <Table.Td>BUY</Table.Td>
+                            <Table.Td>
+                              ${transaction.btcPrice.toFixed(2)}
+                            </Table.Td>
+                            <Table.Td>
+                              ${transaction.buyPrice.toFixed(2)}
+                            </Table.Td>
+                            <Table.Td></Table.Td>
+                          </Table.Tr>
+                        );
+                      } else {
+                        return (
+                          <Table.Tr
+                            key={transaction.id}
+                            className="bg-red-300/50"
+                          >
+                            <Table.Td>
+                              {new Date(transaction.time).toLocaleTimeString()}
+                            </Table.Td>
+                            <Table.Td>SELL</Table.Td>
+                            <Table.Td>
+                              ${transaction.btcPrice.toFixed(2)}
+                            </Table.Td>
+                            <Table.Td>
+                              ${transaction.buyPrice.toFixed(2)}
+                            </Table.Td>
+                            <Table.Td>
+                              ${transaction.profit.toFixed(2)}
+                            </Table.Td>
+                          </Table.Tr>
+                        );
+                      }
+                    })}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            </div>
           </div>
         </div>
-        <Divider orientation='vertical' color='darkgray' />
-        <div className='w-1/3'>
+        <Divider orientation="vertical" color="darkgray" />
+        <div className="w-1/3">
           <Leaderboard />
         </div>
       </div>
     </div>
-  )
+  );
 }
