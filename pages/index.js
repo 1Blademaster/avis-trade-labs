@@ -251,7 +251,7 @@ export default function Home() {
                           <Table.Td>
                             {new Date(transaction.time).toLocaleTimeString()}
                           </Table.Td>
-                          <Table.Td>SELL</Table.Td>
+                          <Table.Td>BUY</Table.Td>
                           <Table.Td>
                             ${transaction.btcPrice.toFixed(2)}
                           </Table.Td>
