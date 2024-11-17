@@ -1,4 +1,5 @@
 import csv
+import math
 
 data = []
 
@@ -18,6 +19,7 @@ def find_csv_files():
     return files
 
 if __name__ == '__main__':
+    """
     files = find_csv_files()
     for file in files:
         data += parse_csv(file)
@@ -28,7 +30,22 @@ if __name__ == '__main__':
             new_data.append(row)
         c+=1
         c%=10
-    with open('data/combed.csv', 'w', newline='') as csvfile:
+    """
+    data = parse_csv('data/combed.csv')
+    new_data = []
+    # replace the close value of each column with the index of the row
+    c = 0
+    for row in data:
+        c += 0.05
+        new_row = []
+        for i in range(len(row)):
+            if i == 4:
+                new_row.append(1000*math.sin(c) + 1000)
+            else:
+                new_row.append(row[i])
+        new_data.append(new_row)
+
+    with open('data/sinWave.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(new_data)
-    print('Data combined, combed and saved to data/combed.csv')
+    print('saved to data/raisingSlope.csv')
