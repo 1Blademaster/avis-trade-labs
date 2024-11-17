@@ -10,9 +10,11 @@ import {
   Divider,
   Modal,
   NumberInput,
+  Paper,
   ScrollArea,
   Stack,
   Table,
+  Tooltip,
 } from '@mantine/core'
 import { useDisclosure, useInterval, useListState } from '@mantine/hooks'
 import Link from 'next/link.js'
@@ -75,7 +77,7 @@ export default function Home() {
   }, 100)
 
   useEffect(() => {
-    // interval.start();
+    interval.start()
     return interval.stop
   }, [])
 
@@ -85,15 +87,14 @@ export default function Home() {
 
   useEffect(() => {
     const balanceLabel = {
+      drawTime: 'afterDatasetsDraw',
       type: 'label',
       yValue: (context) => context.chart.scales.y.max,
       xValue: 'center',
       position: {
-        // x: 'end',
         y: 'start',
       },
       padding: '10',
-      // backgroundColor: tailwindColors.slate[100],
       content: [`Balance: $${currentBal.toFixed(2)}`],
       color: tailwindColors.slate[100],
       font: {
@@ -103,10 +104,8 @@ export default function Home() {
       borderRadius: 5,
     }
 
-    ref?.current.config.options.plugins.annotation.annotations.pop()
-    ref?.current.config.options.plugins.annotation.annotations.push(
+    ref.current.config.options.plugins.annotation.annotations['balanceLabel'] =
       balanceLabel
-    )
     ref?.current.update('quiet')
   }, [currentBal])
 
@@ -142,8 +141,8 @@ export default function Home() {
       },
     }
 
-    ref?.current.config.options.plugins.annotation.annotations.pop()
-    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    delete ref.current.config.options.plugins.annotation.annotations['sellLine']
+    ref.current.config.options.plugins.annotation.annotations['buyLine'] = line
     ref?.current.update('quiet')
 
     setCurrentBal(currentBal - buyPrice)
@@ -193,8 +192,8 @@ export default function Home() {
 
     transactionHistoryHandler.prepend(transaction)
 
-    ref?.current.config.options.plugins.annotation.annotations.pop()
-    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    delete ref.current.config.options.plugins.annotation.annotations['buyLine']
+    ref.current.config.options.plugins.annotation.annotations['sellLine'] = line
     ref?.current.update('quiet')
 
     setCurrentBal(newBal)
@@ -315,9 +314,6 @@ export default function Home() {
             </div>
 
             <div className='flex flex-col gap-y-4 !ml-auto w-11/12'>
-              <p className='text-3xl font-bold'>
-                Balance: ${currentBal.toFixed(2)}
-              </p>
               <ScrollArea h={200} viewportRef={scrollareaViewportRef}>
                 <Table>
                   <Table.Thead>
@@ -335,7 +331,7 @@ export default function Home() {
                         return (
                           <Table.Tr
                             key={transaction.id}
-                            className='bg-[#2ae841]'
+                            className='bg-green-300/50'
                           >
                             <Table.Td>
                               {new Date(transaction.time).toLocaleTimeString()}

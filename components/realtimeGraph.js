@@ -37,7 +37,7 @@ const options = {
       frameRate: 30,
     },
     annotation: {
-      annotations: [],
+      annotations: {},
     },
   },
   scales: {
