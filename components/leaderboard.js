@@ -22,7 +22,7 @@ export default function Leaderboard({ username }) {
   function formatProfit(profit) {
     return profit
       ? profit < 0
-        ? '-$' + Math.abs(profit).toFixed(2)
+        ? '$-' + Math.abs(profit).toFixed(2)
         : '$' + profit.toFixed(2)
       : ''
   }
@@ -61,13 +61,13 @@ export default function Leaderboard({ username }) {
           if (user.username === username) {
             podiumClassName += ' font-bold text-lime-400'
           }
-
+          console.log(user)
           return (
             <Table.Tr key={`tr${idx}`} className={podiumClassName}>
               <Table.Td>{idx + 1}</Table.Td>
               <Table.Td>{user.username}</Table.Td>
               <Table.Td>{formatProfit(user.profit)}</Table.Td>
-              <Table.Td>{user.last_trade ? formatProfit(user.last_trade.profit) : ''}</Table.Td>
+              <Table.Td>{user.latestTransactionDetails ? formatProfit(user.latestTransactionDetails.profit) : ''}</Table.Td>
             </Table.Tr>
           )
         })}
