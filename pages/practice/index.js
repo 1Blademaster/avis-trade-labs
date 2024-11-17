@@ -20,7 +20,7 @@ export default function Practice() {
 
   const cards = cardDescriptions.map((card) => {
     return (
-      <Card shadow="sm" padding="lg" radius="md" withborder className="bg-slate-800 w-80">
+      <Card shadow="sm" padding="lg" radius="md" withborder key={card.title} className="bg-slate-800 w-80">
         <Group position="apart" mt="md" mb="xs">
           <Text weight={500} className="text-white">{card.title}</Text>
           <Badge color={card.color} variant="light">

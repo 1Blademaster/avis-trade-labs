@@ -161,7 +161,7 @@ export default function Home() {
         borderWidth: 2,
         label: {
           backgroundColor: '#3a3a3a',
-          content: `Take Profit: ${stopLoss}%`,
+          content: `Take Profit: ${takeProfit}%`,
           display: true,
           position: 'start',
         },
