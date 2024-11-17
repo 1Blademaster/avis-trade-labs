@@ -33,7 +33,7 @@ export default function Leaderboard() {
     var podiumClassName = ''
 
     if (idx === 0) {
-      podiumClassName = 'bg-yellow-300/50'
+      podiumClassName = 'bg-amber-300/50'
     } else if (idx === 1) {
       podiumClassName = 'bg-green-300/50'
     } else if (idx === 2) {

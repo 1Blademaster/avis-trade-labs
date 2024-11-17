@@ -8,7 +8,7 @@ const green = "#2ae841";
 const red = "red";
 
 export const Bonsai = memo(function Bonsai({}) {
-  const width = 1920;
+  const width = 1450;
   const height = 1080;
   const centerX = width / 2;
   const gap = 2;
@@ -326,17 +326,19 @@ export const Bonsai = memo(function Bonsai({}) {
   }
 
   return (
-    <>
-      <button onClick={() => newGraph()}>New</button>
-      <button onClick={() => generateNextBranch()}>Add</button>
-      <button onClick={() => deleteLastBranch()}>Remove</button>
+    <div className="flex flex-col items-center">
       <canvas
-        className="w-4/5 h-min"
+        className="w-11/12 h-min"
         id="bonsai-canvas"
         width={width}
         height={height}
       ></canvas>
-    </>
+      <div class="flex flex-row gap-4 pt-4">
+        <button onClick={() => newGraph()}>New</button>
+        <button onClick={() => generateNextBranch()}>Add</button>
+        <button onClick={() => deleteLastBranch()}>Remove</button>
+      </div>
+    </div>
   );
 });
 

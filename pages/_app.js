@@ -15,7 +15,7 @@ const theme = createTheme({
 export default function App({ Component, pageProps }) {
   return (
     <UserProvider>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={{ colorScheme: 'dark' }}>
         <Navbar />
         <Component {...pageProps} />
       </MantineProvider>
