@@ -8,10 +8,7 @@ global.data = []
 const maxDataLength = 4_500_000
 
 const fileNames = [
-  'data/btcusd_2016-min_data.csv',
-  'data/btcusd_2018-min_data.csv',
-  'data/btcusd_2020-min_data.csv',
-  'data/btcusd_2022-min_data.csv',
+  'data/combed.csv',
 ]
 
 function loopThroughFiles(currentFileIndex) {
