@@ -48,6 +48,7 @@ export default function Home() {
 
   const [transactionHistory, transactionHistoryHandler] = useListState([]);
   let total = 0;
+  let graphInit = false;
 
   useEffect(() => {
     let newGraphButton = document.getElementById("newGraph");
@@ -59,14 +60,21 @@ export default function Home() {
         let totalData = await res.json();
         let newTotal = totalData[0].total;
 
-        if (newTotal - total > 100) {
+        let newBranchButton = document.getElementById("newBranch");
+        let deleteBranchButton = document.getElementById("removeBranch");
+        if (!graphInit) {
+          for (let i = 0; i <= newTotal; i += 1000) {
+            newBranchButton.click();
+          }
+          graphInit = true;
+        }
+
+        if (newTotal - total > 1000) {
           console.log("Price increase, growing bonsai!");
-          let newBranchButton = document.getElementById("newBranch");
           newBranchButton.click();
           total = newTotal;
-        } else if (newTotal - total < -100) {
+        } else if (newTotal - total < -1000) {
           console.log("Bonsai sad :c");
-          let deleteBranchButton = document.getElementById("removeBranch");
           deleteBranchButton.click();
           total = newTotal;
         }
