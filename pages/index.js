@@ -6,35 +6,18 @@ import {
   Divider,
   NumberInput,
   ScrollArea,
+  Table,
 } from '@mantine/core'
 import { useInterval, useListState } from '@mantine/hooks'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import resolveConfig from 'tailwindcss/resolveConfig'
+import tailwindConfig from '../tailwind.config.js'
 
-function BuyTransactionRow({ transaction }) {
-  return (
-    <div className='flex space-x-2 bg-green-300/50'>
-      <p>{new Date(transaction.time).toLocaleString()}</p>
-      <p>BUY</p>
-      <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
-      <p>Amount: ${transaction.buyPrice.toFixed(2)}</p>
-    </div>
-  )
-}
-
-function SellTransactionRow({ transaction }) {
-  return (
-    <div className='flex space-x-2 bg-red-300/50'>
-      <p>{new Date(transaction.time).toLocaleString()}</p>
-      <p>SELL</p>
-      <p>BTC price: ${transaction.btcPrice.toFixed(2)}</p>
-      <p>Amount: ${transaction.buyPrice.toFixed(2)}</p>
-      <p>Profit: ${transaction.profit.toFixed(2)}</p>
-    </div>
-  )
-}
+const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
 export default function Home() {
   const ref = useRef(null)
+  const scrollareaViewportRef = useRef(null)
 
   const [currentBtcData, setCurrentBtcData] = useState(null)
 
@@ -83,6 +66,10 @@ export default function Home() {
     return interval.stop
   }, [])
 
+  useEffect(() => {
+    scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [transactionHistory])
+
   function buyIn() {
     if (currentBtcData === null) return
 
@@ -105,10 +92,10 @@ export default function Home() {
       type: 'line',
       scaleID: 'y',
       value: currentBtcClose,
-      borderColor: '#a3e635',
+      borderColor: tailwindColors.lime[500],
       borderWidth: 2,
       label: {
-        backgroundColor: '#a3e635',
+        backgroundColor: tailwindColors.lime[500],
         content: `BUY: $${currentBtcClose}`,
         display: true,
         position: 'start',
@@ -162,10 +149,10 @@ export default function Home() {
       type: 'line',
       scaleID: 'y',
       value: currentBtcClose,
-      borderColor: '#f87171',
+      borderColor: tailwindColors.red[500],
       borderWidth: 2,
       label: {
-        backgroundColor: '#f87171',
+        backgroundColor: tailwindColors.red[500],
         content: `SELL: $${currentBtcClose}`,
         display: true,
         position: 'start',
@@ -203,7 +190,7 @@ export default function Home() {
               <ButtonGroup className='w-full'>
                 <Button
                   variant='filled'
-                  color='green'
+                  color={tailwindColors.lime[500]}
                   className='w-full'
                   onClick={buyIn}
                   disabled={currentBal < buyPrice || boughtIn}
@@ -212,7 +199,7 @@ export default function Home() {
                 </Button>
                 <Button
                   variant='filled'
-                  color='red'
+                  color={tailwindColors.red[500]}
                   className='w-full'
                   onClick={sellOut}
                   disabled={!boughtIn}
@@ -238,22 +225,65 @@ export default function Home() {
             <p className='font-bold text-3xl'>
               Balance: ${currentBal.toFixed(2)}
             </p>
-            <ScrollArea h={200}>
-              {transactionHistory.map((transaction) => {
-                if (transaction.type === 'buy') {
-                  return (
-                    <Fragment key={transaction.id}>
-                      <BuyTransactionRow transaction={transaction} />
-                    </Fragment>
-                  )
-                } else {
-                  return (
-                    <Fragment key={transaction.id}>
-                      <SellTransactionRow transaction={transaction} />
-                    </Fragment>
-                  )
-                }
-              })}
+            <ScrollArea
+              h={200}
+              viewportRef={scrollareaViewportRef}
+              className='!ml-auto w-2/5'
+            >
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Time</Table.Th>
+                    <Table.Th>Type</Table.Th>
+                    <Table.Th>Buy price</Table.Th>
+                    <Table.Th>Amount</Table.Th>
+                    <Table.Th>Profit</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {transactionHistory.map((transaction) => {
+                    if (transaction.type === 'buy') {
+                      return (
+                        <Table.Tr
+                          key={transaction.id}
+                          className='bg-green-300/50'
+                        >
+                          <Table.Td>
+                            {new Date(transaction.time).toLocaleTimeString()}
+                          </Table.Td>
+                          <Table.Td>SELL</Table.Td>
+                          <Table.Td>
+                            ${transaction.btcPrice.toFixed(2)}
+                          </Table.Td>
+                          <Table.Td>
+                            ${transaction.buyPrice.toFixed(2)}
+                          </Table.Td>
+                          <Table.Td></Table.Td>
+                        </Table.Tr>
+                      )
+                    } else {
+                      return (
+                        <Table.Tr
+                          key={transaction.id}
+                          className='bg-red-300/50'
+                        >
+                          <Table.Td>
+                            {new Date(transaction.time).toLocaleTimeString()}
+                          </Table.Td>
+                          <Table.Td>SELL</Table.Td>
+                          <Table.Td>
+                            ${transaction.btcPrice.toFixed(2)}
+                          </Table.Td>
+                          <Table.Td>
+                            ${transaction.buyPrice.toFixed(2)}
+                          </Table.Td>
+                          <Table.Td>${transaction.profit.toFixed(2)}</Table.Td>
+                        </Table.Tr>
+                      )
+                    }
+                  })}
+                </Table.Tbody>
+              </Table>
             </ScrollArea>
           </div>
         </div>
