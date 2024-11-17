@@ -9,25 +9,56 @@ export default function Bonsai() {
   const width = 1920;
   const height = 1080;
   const centerX = width / 2;
-  const lineLength = 20;
   const gap = 7.5;
   const startingPoint = [centerX, height];
-  let treeHeight = 25;
+  let lastBranchId = "3r2";
+  let lineWidth = 4;
+  let lineLength = 20;
+  let treeHeight = 3;
   let ctx;
   let points;
   let references;
   let math;
 
+  function drawGraph() {
+    const canvas = document.getElementById("bonsai-canvas");
+    ctx = canvas.getContext("2d");
+    initDraw();
+    generateLines(ctx, treeHeight);
+  }
+
+  function generateNextBranch() {
+    ctx.clearRect(0, 0, width, height);
+    initDraw();
+
+    let [failedLine, failedOn] = generateLines(ctx, treeHeight);
+    console.log(lastBranchId, failedOn);
+    if (lastBranchId == failedOn) {
+      treeHeight += 1;
+      lastBranchId = `${treeHeight}r0`;
+    } else {
+      if (failedLine) {
+        lastBranchId = failedOn;
+      }
+    }
+  }
+
   function generateNextLayer() {
     ctx.clearRect(0, 0, width, height);
     treeHeight += 1;
     initDraw();
+    generateLines(ctx, treeHeight);
   }
 
   function deleteLastLayer() {
     ctx.clearRect(0, 0, width, height);
     treeHeight -= 1;
     initDraw();
+    generateLines(ctx, treeHeight);
+  }
+
+  function updateLineHeight() {
+    lineLength = Math.round((height - 500) / treeHeight);
   }
 
   function resetMaths() {
@@ -60,18 +91,20 @@ export default function Bonsai() {
     let validDirections = [up, left, right];
     let row = 2;
     let angleVariance = 0;
+    let failed = false;
+    let failedOn = "";
 
     // Look at each branch that's on the row below, pick a valid branch and place it at random.
     // Tick up row and continue till max
-    for (let currentRow = row; currentRow < maxHeight; currentRow++) {
+    for (let currentRow = row; currentRow <= maxHeight; currentRow++) {
       let previousRow = currentRow - 1;
       let previousKeys = Object.keys(references).filter((x) =>
         x.startsWith(`${previousRow}r`)
       );
 
       console.debug(references);
-
       console.debug("Starting with previous row of " + previousRow);
+
       let branchId = 0;
       previousKeys.forEach((key) => {
         validDirections.forEach((direction) => {
@@ -98,22 +131,37 @@ export default function Bonsai() {
               yEnd,
               false,
             ];
-            branchId++;
 
-            // Draw line
-            ctx.beginPath();
-            ctx.moveTo(xStart, yStart);
-            ctx.lineTo(xEnd, yEnd);
-            ctx.lineWidth = 4;
-            ctx.shadowBlur = currentRow < 5 ? 10 : 0;
-            ctx.lineCap = "round";
-            ctx.shadowColor = "blue";
-            ctx.strokeStyle = currentRow < 5 ? "white" : "gray";
-            ctx.stroke();
+            let splitBranch = lastBranchId.split("r");
+            // console.log(currentRow, branchId);
+            if (
+              currentRow < splitBranch[0] ||
+              (currentRow == splitBranch[0] && branchId <= splitBranch[1])
+            ) {
+              // Draw line
+              ctx.beginPath();
+              ctx.moveTo(xStart, yStart);
+              ctx.lineTo(xEnd, yEnd);
+              ctx.lineWidth = 4;
+              ctx.shadowBlur = currentRow < 5 ? 10 : 0;
+              ctx.lineCap = "round";
+              ctx.shadowColor = "blue";
+              ctx.strokeStyle = currentRow < 5 ? "white" : "gray";
+              ctx.stroke();
+
+              failedOn = `${currentRow}r${branchId}`;
+              branchId++;
+            } else {
+              console.log("Skipped: " + `${currentRow}r${branchId}`);
+              failedOn = `${currentRow}r${branchId}`;
+              failed = true;
+              return;
+            }
           }
         });
       });
     }
+    return [failed, failedOn];
   }
 
   function testPath(passedAngle, referencePoint, label, touching) {
@@ -185,11 +233,10 @@ export default function Bonsai() {
   }
 
   function initDraw() {
+    updateLineHeight();
     resetMaths();
     resetPoints();
     resetReferences();
-
-    console.log(points, references);
 
     points.forEach((point) => {
       // Get variables from point
@@ -221,30 +268,23 @@ export default function Bonsai() {
         ctx.beginPath();
         ctx.moveTo(xStart, yStart);
         ctx.lineTo(xEnd, yEnd);
-        ctx.lineWidth = 4;
-        ctx.shadowBlur = highlighted ? 10 : 0;
+        ctx.lineWidth = lineWidth;
+        ctx.shadowBlur = highlighted ? 2 * lineWidth : 0;
         ctx.lineCap = "round";
         ctx.shadowColor = "blue";
         ctx.strokeStyle = highlighted ? "white" : "gray";
         ctx.stroke();
       }
     });
-
-    generateLines(ctx, treeHeight);
   }
-
-  useEffect(() => {
-    const canvas = document.getElementById("bonsai-canvas");
-    ctx = canvas.getContext("2d");
-    initDraw();
-  }, []);
 
   return (
     <>
-      <button onClick={() => generateNextLayer()}>Bruh</button>
-      <button onClick={() => deleteLastLayer()}>WHAT!</button>
+      <button onClick={() => drawGraph()}>New</button>
+      <button onClick={() => generateNextBranch()}>Add</button>
+      <button onClick={() => deleteLastLayer()}>Remove</button>
       <canvas
-        className="w-64 h-64"
+        className="w-2/3 h-2/3"
         id="bonsai-canvas"
         width={width}
         height={height}
