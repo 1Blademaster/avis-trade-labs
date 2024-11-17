@@ -56,18 +56,20 @@ export default function Home() {
       const data = { x: Date.now(), y: btcData.close }
       ref?.current.data.datasets[0].data.push(data)
       ref?.current.update('quiet')
-
+      
       const lastTransaction = transactionHistory[0]
+
       if (
-        boughtIn &&
+        boughtIn && stopLossEnabled &&
         stopLoss / 100 <=
           (lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
         sellOut()
-      } else if (
-        boughtIn &&
-        stopLoss / 100 <=
+      } 
+      if (
+        boughtIn && takeProfitEnabled &&
+        takeProfit / 100 <=
           -(lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
@@ -110,6 +112,57 @@ export default function Home() {
     ref?.current.update('quiet')
   }, [currentBal])
 
+  useEffect(() => {
+    delete ref.current.config.options.plugins.annotation.annotations['stopLossLine']
+    delete ref.current.config.options.plugins.annotation.annotations['takeProfitLine']
+    if (!boughtIn) { 
+      ref.current.update("quiet")
+      return
+    }
+
+    if (stopLossEnabled){
+      const stopLossLine = {
+        drawTime: 'afterDatasetsDraw',
+        type: 'line',
+        scaleID: 'y',
+        borderDash: [10,5],
+        value: transactionHistory[0].btcPrice * (1-(stopLoss/100)),
+        borderColor: '#fafafa',
+        borderWidth: 2,
+        label: {
+          backgroundColor: '#fafafa',
+          content: `Stop Loss: ${stopLoss}%`,
+          display: true,
+          position: 'start',
+        },
+      }
+      ref.current.config.options.plugins.annotation.annotations['stopLossLine'] = stopLossLine
+    }
+
+    if (takeProfitEnabled){
+      const takeProfitLine = {
+        drawTime: 'afterDatasetsDraw',
+        type: 'line',
+        scaleID: 'y',
+        borderDash: [10,5],
+        value: transactionHistory[0].btcPrice * (1+(takeProfit/100)),
+        borderColor: '#fafafa',
+        borderWidth: 2,
+        label: {
+          backgroundColor: '#fafafa',
+          content: `Take Profit: ${stopLoss}%`,
+          display: true,
+          position: 'start',
+        },
+      }
+      ref.current.config.options.plugins.annotation.annotations['takeProfitLine'] = takeProfitLine
+    }
+
+    ref.current.update("quiet")
+  
+  }, [boughtIn, stopLoss, stopLossEnabled, takeProfit, takeProfitEnabled])
+
+
   function buyIn() {
     if (currentBtcData === null) return
 
@@ -145,7 +198,7 @@ export default function Home() {
     delete ref.current.config.options.plugins.annotation.annotations['sellLine']
     ref.current.config.options.plugins.annotation.annotations['buyLine'] = line
     ref?.current.update('quiet')
-
+    
     setCurrentBal(currentBal - buyPrice)
     setBuyPrice(100)
   }
