@@ -1,19 +1,17 @@
 const fs = require('fs')
 const csv = require('fast-csv')
 
-import dt from '../public/combed.csv'
-
 const varianceMultiplier = 25
 const valueOffset = -(427500 / 100)
 
 global.data = []
 const maxDataLength = 4_500_000
 
-const fileNames = ['/var/task/.next/server/public/combed.csv']
+const fileNames = ['./public/combed.csv']
 
 function loopThroughFiles(currentFileIndex) {
-  console.log(__dirname, dt, dt.path)
-  fs.createReadStream(dt.path)
+  console.log(__dirname)
+  fs.createReadStream(fileNames[currentFileIndex])
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
