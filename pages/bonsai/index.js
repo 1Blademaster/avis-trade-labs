@@ -171,6 +171,9 @@ export default function Bonsai() {
             ];
 
             let splitBranch = lastBranchId.split("r");
+            let colourCondition =
+              currentRow < splitBranch[0] ||
+              (currentRow == splitBranch[0] && branchId < splitBranch[1]);
             // console.log(currentRow, branchId);
             if (
               currentRow < splitBranch[0] ||
@@ -181,10 +184,10 @@ export default function Bonsai() {
               ctx.moveTo(xStart, yStart);
               ctx.lineTo(xEnd, yEnd);
               ctx.lineWidth = 4;
-              ctx.shadowBlur = currentRow < 5 ? 10 : 0;
+              ctx.shadowBlur = colourCondition ? 10 : 0;
               ctx.lineCap = "round";
               ctx.shadowColor = "blue";
-              ctx.strokeStyle = currentRow < 5 ? "white" : "gray";
+              ctx.strokeStyle = colourCondition ? "white" : "gray";
               ctx.stroke();
 
               failedOn = `${currentRow}r${branchId}`;
