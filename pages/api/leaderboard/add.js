@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { ObjectId, Timestamp } from 'mongodb'
 import clientPromise from '../../../lib/mongodb'
 
 export async function addProfit(user_email, profitMade) {
@@ -26,6 +26,7 @@ export async function addProfit(user_email, profitMade) {
   await db.collection('Leaderboard').insertOne({
     user_id: new ObjectId(user._id),
     profit: profitMade,
+    createtime: new Timestamp()
   })
 }
 
