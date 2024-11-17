@@ -213,7 +213,7 @@ export default function Home() {
     ref?.current.update("quiet");
 
     setCurrentBal(currentBal - buyPrice);
-    setBuyPrice(100);
+    setBuyPrice(buyPrice);
   }
 
   async function sellOut() {

@@ -224,7 +224,7 @@ export default function Practice({ backendUrl, startBalance, target }) {
     ref?.current.update("quiet");
 
     setCurrentBal(currentBal - buyPrice);
-    setBuyPrice(100);
+    setBuyPrice(buyPrice);
   }
 
   async function sellOut() {
