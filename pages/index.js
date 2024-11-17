@@ -132,7 +132,7 @@ export default function Home() {
         borderColor: '#fafafa',
         borderWidth: 2,
         label: {
-          backgroundColor: '#fafafa',
+          backgroundColor: '#3a3a3a',
           content: `Stop Loss: ${stopLoss}%`,
           display: true,
           position: 'start',
@@ -151,7 +151,7 @@ export default function Home() {
         borderColor: '#fafafa',
         borderWidth: 2,
         label: {
-          backgroundColor: '#fafafa',
+          backgroundColor: '#3a3a3a',
           content: `Take Profit: ${stopLoss}%`,
           display: true,
           position: 'start',
