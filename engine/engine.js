@@ -38,12 +38,7 @@ if (global.interval !== null || global.interval !== undefined) {
 }
 global.interval = null
 
-export var btcData = {
-  close: 0,
-  time: null,
-}
-
-if (global.current === 0) {
+function main() {
   loopThroughFiles(0)
   clearInterval(global.interval)
   global.interval = null
@@ -56,4 +51,14 @@ if (global.current === 0) {
     btcData.time = parseInt(data[current]?.Timestamp)
     // console.log(current, btcData)
   }, 10)
+}
+
+if (global.current === 0) {
+  console.log(global.current)
+  main()
+}
+
+export var btcData = {
+  close: 0,
+  time: null,
 }
