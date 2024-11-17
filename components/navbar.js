@@ -8,7 +8,7 @@ export default function Navbar() {
   const {user, isLoading, err} = useUser();
 
   return (
-    <div className='flex flex-row justify-center items-center space-x-8 py-4 bg-slate-800'>
+    <div className='flex flex-row items-center justify-center py-4 space-x-8 bg-slate-800'>
       <Link href='/'>
         <h1 className='text-3xl font-bold hover:cursor-pointer text-[#2ae841]'>
           Avis Trade Labs

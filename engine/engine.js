@@ -1,10 +1,10 @@
 const fs = require('fs')
 const csv = require('fast-csv')
 
-const varianceMultiplier = 1000
-const valueOffset = -427500
+const varianceMultiplier = 50
+const valueOffset = -(427500 / 20)
 
-const data = []
+global.data = []
 
 const fileNames = [
   'data/btcusd_2016-min_data.csv',
@@ -18,7 +18,7 @@ function loopThroughFiles(currentFileIndex) {
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
     .on('data', (row) => {
-      data.push({ Close: row.Close, Timestamp: row.Timestamp })
+      global.data.push({ Close: row.Close, Timestamp: row.Timestamp })
     })
     .on('end', (rowCount) => {
       console.log(`Parsed ${rowCount} rows`)
@@ -31,6 +31,7 @@ function loopThroughFiles(currentFileIndex) {
 }
 
 global.current = 0
+global.interval = null
 
 export var btcData = {
   close: 0,
@@ -39,12 +40,14 @@ export var btcData = {
 
 if (global.current === 0) {
   loopThroughFiles(0)
-  setInterval(() => {
+  global.interval = null
+  global.data = []
+  global.interval = setInterval(() => {
     current = current + 1
     btcData.close = parseFloat(
       data[current]?.Close * varianceMultiplier + valueOffset
     )
     btcData.time = parseInt(data[current]?.Timestamp)
-    console.log(current, data.length)
+    console.log(current, global.data.length)
   }, 100)
 }

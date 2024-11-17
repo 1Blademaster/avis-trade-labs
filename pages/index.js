@@ -1,11 +1,11 @@
+import Leaderboard from '@/components/leaderboard'
 import RealtimeGraph from '@/components/realtimeGraph'
-import { Button, ButtonGroup, NumberInput, ScrollArea, Modal, Stack } from '@mantine/core'
+import { Button, ButtonGroup, NumberInput, ScrollArea, Modal, Stack, NumberInput, ScrollArea } from '@mantine/core'
 import { useInterval, useListState, useDisclosure } from '@mantine/hooks'
 
 import Link from 'next/link'
 
 import { useUser } from '@auth0/nextjs-auth0/client'
-
 import { Fragment, useEffect, useRef, useState } from 'react'
 
 function BuyTransactionRow({ transaction }) {
@@ -41,6 +41,8 @@ export default function Home() {
   const [boughtIn, setBoughtIn] = useState(false)
   
   const REQUIRE_LOGIN = true; // false for dev
+  const [stopLoss, setStopLoss] = useState(20)
+  const [takeProfit, setTakeProfit] = useState(20)
 
   const {user, error, isLoading } = useUser();
   console.log(user);
@@ -55,55 +57,72 @@ export default function Home() {
           if (btcData.time === null) return
           
           setCurrentBtcData(btcData)
-          
+
           const data = { x: Date.now(), y: btcData.close }
           ref?.current.data.datasets[0].data.push(data)
           ref?.current.update('quiet')
-        }
-        fetchPosts()
-    }, 100)
 
-    const loadScoreboardData = async () => {
-        console.log("Score: " +  score)
-    }
-    
-    useEffect(() => {
-        loadScoreboardData();
-        interval.start()
-        return interval.stop
-    }, [])
-    
-    function buyIn() {
-        if (currentBtcData === null) return
-        
-        const currentBtcClose = currentBtcData.close
-        
-        const transaction = {
-            id: crypto.randomUUID(),
-            type: 'buy',
-            btcPrice: currentBtcClose,
-            buyPrice: buyPrice,
-            time: new Date(),
+          const lastTransaction = transactionHistory[0]
+          if (
+            boughtIn &&
+            stopLoss / 100 <=
+            (lastTransaction.btcPrice - currentBtcData.close) /
+                lastTransaction.btcPrice
+          ) {
+            sellOut()
+          } else if (
+            boughtIn &&
+            stopLoss / 100 <=
+            -(lastTransaction.btcPrice - currentBtcData.close) /
+                lastTransaction.btcPrice
+          ) {
+            sellOut()
+           }
         }
-        
-        // console.log(transaction)
-        
-        transactionHistoryHandler.prepend(transaction)
-        
-        const line = {
-            drawTime: 'afterDatasetsDraw',
+    fetchPosts()
+  }, 100)
+
+  useEffect(() => {
+    interval.start()
+    return interval.stop
+  }, [])
+
+  function buyIn() {
+    if (currentBtcData === null) return
+
+    setBoughtIn(true)
+
+    const currentBtcClose = currentBtcData.close
+
+    const transaction = {
+      id: crypto.randomUUID(),
+      type: 'buy',
+      btcPrice: currentBtcClose,
+      buyPrice: buyPrice,
+      time: new Date(),
+    }
+
+    transactionHistoryHandler.prepend(transaction)
+
+    const line = {
+      drawTime: 'afterDatasetsDraw',
       type: 'line',
       scaleID: 'y',
       value: currentBtcClose,
       borderColor: '#a3e635',
       borderWidth: 2,
+      label: {
+        backgroundColor: '#a3e635',
+        content: `BUY: $${currentBtcClose}`,
+        display: true,
+        position: 'start',
+      },
     }
 
     ref?.current.config.options.plugins.annotation.annotations.pop()
     ref?.current.config.options.plugins.annotation.annotations.push(line)
     ref?.current.update('quiet')
 
-    setBoughtIn(true)
     setCurrentBal(currentBal - buyPrice)
     setBuyPrice(100)
   }
@@ -111,7 +130,9 @@ export default function Home() {
   if (isLoading) return <div>Loading...</div>;
 
   function sellOut() {
-    if (currentBal === 0 || !boughtIn) return
+    if (!boughtIn) return
+
+    setBoughtIn(false)
 
     const lastTransaction = transactionHistory[0]
 
@@ -122,10 +143,12 @@ export default function Home() {
     // current_bal + ( ( (current_btc_close - last_btc_close) * amount ) + amount )
 
     const newBal =
-      currentBal + (currentBtcClose * (lastTransaction.buyPrice/lastTransaction.btcPrice))
+      currentBal +
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice)
 
-    const profit = 
-      ((currentBtcClose) * (lastTransaction.buyPrice/lastTransaction.btcPrice)) - lastTransaction.buyPrice
+    const profit =
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice) -
+      lastTransaction.buyPrice
 
     // (currentBtcClose - lastTransaction.btcPrice) * lastTransaction.buyPrice
 
@@ -147,6 +170,12 @@ export default function Home() {
       value: currentBtcClose,
       borderColor: '#f87171',
       borderWidth: 2,
+      label: {
+        backgroundColor: '#f87171',
+        content: `SELL: $${currentBtcClose}`,
+        display: true,
+        position: 'start',
+      },
     }
 
     transactionHistoryHandler.prepend(transaction)
@@ -157,14 +186,13 @@ export default function Home() {
 
     // console.log(ref?.current.config.options.plugins.annotation.annotations)
 
-    setBoughtIn(false)
     setCurrentBal(newBal)
   }
 
   return (
-    <div className='h-full flex p-4'>
-      <div className='flex flex-row w-full'>
-        <div className='flex flex-col w-2/3'>
+    <div className='flex p-4'>
+      <div className='flex flex-row w-full space-x-4'>
+        <div className='flex flex-col w-full space-y-8'>
           <Modal 
             opened={opened} 
             overlayProps={{
@@ -219,11 +247,25 @@ export default function Home() {
                   SELL
                 </Button>
               </ButtonGroup>
+              <NumberInput
+                suffix='%'
+                value={stopLoss}
+                onChange={setStopLoss}
+                allowNegative={false}
+                hideControls
+              />
+              <NumberInput
+                suffix='%'
+                value={takeProfit}
+                onChange={setTakeProfit}
+                allowNegative={false}
+                hideControls
+              />
             </div>
             <p className='font-bold text-3xl'>
               Balance: ${currentBal.toFixed(2)}
             </p>
-            <ScrollArea h={250}>
+            <ScrollArea h={200}>
               {transactionHistory.map((transaction) => {
                 if (transaction.type === 'buy') {
                   return (
@@ -241,6 +283,10 @@ export default function Home() {
               })}
             </ScrollArea>
           </div>
+        </div>
+        <Divider orientation='vertical' color='darkgray' />
+        <div className='w-1/3'>
+          <Leaderboard />
         </div>
       </div>
     </div>
