@@ -485,7 +485,7 @@ export default function Home() {
             </Tabs.List>
 
             <Tabs.Panel value='leaderboard'>
-              <Leaderboard username={user.username} />
+              <Leaderboard username={user?.username} />
             </Tabs.Panel>
             <Tabs.Panel value='tree'>
               <div className='pt-4'>
