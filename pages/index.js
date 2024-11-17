@@ -283,249 +283,282 @@ export default function Home() {
   }
 
   return (
-    <div className="flex p-4">
-      <div className="flex flex-row w-full space-x-4">
-        <div className="relative flex flex-col w-full space-y-8">
-          {!playing && (
-            <Overlay color="#000" backgroundOpacity={0.35} blur={15}>
-              <div className="flex flex-col items-center justify-center w-1/3 h-full mx-auto space-y-8 text-center">
-                <p>
-                  Get ready to buy low and sell high! Make as much profit as you
-                  can to add to your total on the global leaderboard and grow
-                  our money tree.
-                </p>
-                <Button
-                  onClick={() => setPlaying(true)}
-                  className="w-32 text-xl"
-                >
-                  Play
-                </Button>
+    <>
+      <div className="flex p-4">
+        <div className="flex flex-row w-full space-x-4">
+          <div className="relative flex flex-col w-full space-y-8">
+            {!playing && (
+              <Overlay
+                color="#000"
+                backgroundOpacity={0.35}
+                blur={15}
+                hidden={!user}
+              >
+                <div className="flex flex-col items-center justify-center w-1/3 h-full mx-auto space-y-8 text-center">
+                  <p>
+                    Get ready to buy low and sell high! Make as much profit as
+                    you can to add to your total on the global leaderboard and
+                    grow our money tree.
+                  </p>
+                  <Button
+                    onClick={() => setPlaying(true)}
+                    className="w-32 text-xl"
+                  >
+                    Play
+                  </Button>
+                </div>
+              </Overlay>
+            )}
+
+            <Overlay
+              color="#000"
+              backgroundOpacity={0.35}
+              blur={15}
+              hidden={user}
+            >
+              <div className="flex flex-col items-center justify-center w-1/3 h-full mx-auto space-y-4 text-center">
+                <p>You need to be logged in to access live mode.</p>
+                <div className="flex flex-row items-center gap-x-4">
+                  <Button
+                    onClick={() => {
+                      window.location.href = "/api/auth/login";
+                    }}
+                    className="w-32 text-xl"
+                  >
+                    Login
+                  </Button>
+                </div>
               </div>
             </Overlay>
-          )}
-          <Modal
-            opened={opened}
-            overlayProps={{
-              backgroundOpacity: 0.3,
-              blur: 3,
-            }}
-            styles={{
-              header: { backgroundColor: "#2d2d2d" },
-              content: { backgroundColor: "#2d2d2d" },
-            }}
-            centered
-            onClose={user ? close : () => {}}
-            withCloseButton={false}
-          >
-            <Stack align="center">
-              You must be logged to play.
-              <Button component={Link} href="/api/auth/login" w={"33%"}>
-                Login
-              </Button>
-            </Stack>
-          </Modal>
-          <div className="h-3/4">
-            <RealtimeGraph ref={ref} datasetLabel={"BTC"} />
-          </div>
-          <div className="flex flex-row space-x-8">
-            <div className="flex flex-col space-y-4">
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Buy Amount</p>
-                <div className="flex flex-row space-x-4">
-                  <div className="flex flex-col space-y-2 w-3/5">
-                    <NumberInput
-                      prefix="$"
-                      value={buyPrice.toFixed(2)}
-                      onChange={setBuyPrice}
-                      allowNegative={false}
-                      min={1}
-                      hideControls
-                    />
-                    <ButtonGroup>
+
+            <Modal
+              opened={opened}
+              overlayProps={{
+                backgroundOpacity: 0.3,
+                blur: 3,
+              }}
+              styles={{
+                header: { backgroundColor: "#2d2d2d" },
+                content: { backgroundColor: "#2d2d2d" },
+              }}
+              centered
+              onClose={user ? close : () => {}}
+              withCloseButton={false}
+            >
+              <Stack align="center">
+                You must be logged to play.
+                <Button component={Link} href="/api/auth/login" w={"33%"}>
+                  Login
+                </Button>
+              </Stack>
+            </Modal>
+            <div className="h-3/4">
+              <RealtimeGraph ref={ref} datasetLabel={"BTC"} />
+            </div>
+            <div className="flex flex-row space-x-8">
+              <div className="flex flex-col space-y-4">
+                <Paper shadow="xs" p="sm" className="bg-slate-800">
+                  <p className="mb-2">Buy Amount</p>
+                  <div className="flex flex-row space-x-4">
+                    <div className="flex flex-col w-3/5 space-y-2">
+                      <NumberInput
+                        prefix="$"
+                        value={buyPrice.toFixed(2)}
+                        onChange={setBuyPrice}
+                        allowNegative={false}
+                        min={1}
+                        hideControls
+                      />
+                      <ButtonGroup>
+                        <Button
+                          variant="filled"
+                          className="w-full"
+                          onClick={() => setBuyPrice(currentBal / 2)}
+                          autoContrast
+                          size="compact-sm"
+                        >
+                          1/2
+                        </Button>
+                        <Button
+                          variant="filled"
+                          className="w-full"
+                          onClick={() => setBuyPrice(currentBal)}
+                          autoContrast
+                          size="compact-sm"
+                        >
+                          MAX
+                        </Button>
+                      </ButtonGroup>
+                    </div>
+                    <ButtonGroup
+                      className="justify-between w-1/2"
+                      orientation="vertical"
+                    >
                       <Button
                         variant="filled"
+                        color="#2ae841"
                         className="w-full"
-                        onClick={() => setBuyPrice(currentBal / 2)}
+                        onClick={buyIn}
+                        disabled={currentBal < buyPrice || boughtIn}
                         autoContrast
-                        size="compact-sm"
                       >
-                        1/2
+                        BUY
                       </Button>
                       <Button
                         variant="filled"
+                        color={tailwindColors.red[500]}
                         className="w-full"
-                        onClick={() => setBuyPrice(currentBal)}
+                        onClick={sellOut}
+                        disabled={!boughtIn}
                         autoContrast
-                        size="compact-sm"
                       >
-                        MAX
+                        SELL
                       </Button>
                     </ButtonGroup>
                   </div>
-                  <ButtonGroup
-                    className="w-1/2 justify-between"
-                    orientation="vertical"
-                  >
-                    <Button
-                      variant="filled"
-                      color="#2ae841"
+                </Paper>
+
+                <Paper shadow="xs" p="sm" className="bg-slate-800">
+                  <p className="mb-2">Take Profit</p>
+                  <div className="flex flex-row items-center space-x-2">
+                    <Tooltip label="Take Profit">
+                      <Checkbox
+                        color="#2ae841"
+                        checked={takeProfitEnabled}
+                        onChange={(e) =>
+                          setTakeProfitEnabled(e.currentTarget.checked)
+                        }
+                      />
+                    </Tooltip>
+                    <NumberInput
+                      suffix="%"
+                      value={takeProfit}
+                      onChange={setTakeProfit}
+                      allowNegative={false}
+                      disabled={!takeProfitEnabled}
+                      hideControls
                       className="w-full"
-                      onClick={buyIn}
-                      disabled={currentBal < buyPrice || boughtIn}
-                      autoContrast
-                    >
-                      BUY
-                    </Button>
-                    <Button
-                      variant="filled"
-                      color={tailwindColors.red[500]}
+                    />
+                  </div>
+                </Paper>
+
+                <Paper shadow="xs" p="sm" className="bg-slate-800">
+                  <p className="mb-2">Stop Loss</p>
+                  <div className="flex flex-row items-center space-x-2">
+                    <Tooltip label="Stop Loss">
+                      <Checkbox
+                        color="#2ae841"
+                        checked={stopLossEnabled}
+                        onChange={(e) =>
+                          setStopLossEnabled(e.currentTarget.checked)
+                        }
+                      />
+                    </Tooltip>
+                    <NumberInput
+                      suffix="%"
+                      value={stopLoss}
+                      onChange={setStopLoss}
+                      disabled={!stopLossEnabled}
+                      allowNegative={false}
+                      hideControls
                       className="w-full"
-                      onClick={sellOut}
-                      disabled={!boughtIn}
-                      autoContrast
-                    >
-                      SELL
-                    </Button>
-                  </ButtonGroup>
-                </div>
-              </Paper>
-
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Take Profit</p>
-                <div className="flex flex-row items-center space-x-2">
-                  <Tooltip label="Take Profit">
-                    <Checkbox
-                      color="#2ae841"
-                      checked={takeProfitEnabled}
-                      onChange={(e) =>
-                        setTakeProfitEnabled(e.currentTarget.checked)
-                      }
                     />
-                  </Tooltip>
-                  <NumberInput
-                    suffix="%"
-                    value={takeProfit}
-                    onChange={setTakeProfit}
-                    allowNegative={false}
-                    disabled={!takeProfitEnabled}
-                    hideControls
-                    className="w-full"
-                  />
-                </div>
-              </Paper>
+                  </div>
+                </Paper>
+              </div>
 
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Stop Loss</p>
-                <div className="flex flex-row items-center space-x-2">
-                  <Tooltip label="Stop Loss">
-                    <Checkbox
-                      color="#2ae841"
-                      checked={stopLossEnabled}
-                      onChange={(e) =>
-                        setStopLossEnabled(e.currentTarget.checked)
-                      }
-                    />
-                  </Tooltip>
-                  <NumberInput
-                    suffix="%"
-                    value={stopLoss}
-                    onChange={setStopLoss}
-                    disabled={!stopLossEnabled}
-                    allowNegative={false}
-                    hideControls
-                    className="w-full"
-                  />
-                </div>
-              </Paper>
-            </div>
-
-            <div className="flex flex-col gap-y-4 !ml-auto w-2/5">
-              <ScrollArea h={400} viewportRef={scrollareaViewportRef}>
-                <Table>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>Time</Table.Th>
-                      <Table.Th>Type</Table.Th>
-                      <Table.Th>Buy price</Table.Th>
-                      <Table.Th>Amount</Table.Th>
-                      <Table.Th>Profit</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {transactionHistory.map((transaction) => {
-                      if (transaction.type === "buy") {
-                        return (
-                          <Table.Tr
-                            key={transaction.id}
-                            className="bg-green-300/50"
-                          >
-                            <Table.Td>
-                              {new Date(transaction.time).toLocaleTimeString()}
-                            </Table.Td>
-                            <Table.Td>BUY</Table.Td>
-                            <Table.Td>
-                              ${transaction.btcPrice.toFixed(2)}
-                            </Table.Td>
-                            <Table.Td>
-                              ${transaction.buyPrice.toFixed(2)}
-                            </Table.Td>
-                            <Table.Td></Table.Td>
-                          </Table.Tr>
-                        );
-                      } else {
-                        return (
-                          <Table.Tr
-                            key={transaction.id}
-                            className="bg-red-300/50"
-                          >
-                            <Table.Td>
-                              {new Date(transaction.time).toLocaleTimeString()}
-                            </Table.Td>
-                            <Table.Td>SELL</Table.Td>
-                            <Table.Td>
-                              ${transaction.btcPrice.toFixed(2)}
-                            </Table.Td>
-                            <Table.Td>
-                              ${transaction.buyPrice.toFixed(2)}
-                            </Table.Td>
-                            <Table.Td>
-                              ${transaction.profit.toFixed(2)}
-                            </Table.Td>
-                          </Table.Tr>
-                        );
-                      }
-                    })}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
+              <div className="flex flex-col gap-y-4 !ml-auto w-2/5">
+                <ScrollArea h={400} viewportRef={scrollareaViewportRef}>
+                  <Table>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>Time</Table.Th>
+                        <Table.Th>Type</Table.Th>
+                        <Table.Th>Buy price</Table.Th>
+                        <Table.Th>Amount</Table.Th>
+                        <Table.Th>Profit</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {transactionHistory.map((transaction) => {
+                        if (transaction.type === "buy") {
+                          return (
+                            <Table.Tr
+                              key={transaction.id}
+                              className="bg-green-300/50"
+                            >
+                              <Table.Td>
+                                {new Date(
+                                  transaction.time
+                                ).toLocaleTimeString()}
+                              </Table.Td>
+                              <Table.Td>BUY</Table.Td>
+                              <Table.Td>
+                                ${transaction.btcPrice.toFixed(2)}
+                              </Table.Td>
+                              <Table.Td>
+                                ${transaction.buyPrice.toFixed(2)}
+                              </Table.Td>
+                              <Table.Td></Table.Td>
+                            </Table.Tr>
+                          );
+                        } else {
+                          return (
+                            <Table.Tr
+                              key={transaction.id}
+                              className="bg-red-300/50"
+                            >
+                              <Table.Td>
+                                {new Date(
+                                  transaction.time
+                                ).toLocaleTimeString()}
+                              </Table.Td>
+                              <Table.Td>SELL</Table.Td>
+                              <Table.Td>
+                                ${transaction.btcPrice.toFixed(2)}
+                              </Table.Td>
+                              <Table.Td>
+                                ${transaction.buyPrice.toFixed(2)}
+                              </Table.Td>
+                              <Table.Td>
+                                ${transaction.profit.toFixed(2)}
+                              </Table.Td>
+                            </Table.Tr>
+                          );
+                        }
+                      })}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
+              </div>
             </div>
           </div>
-        </div>
 
-        <Divider orientation="vertical" color="darkgray" />
+          <Divider orientation="vertical" color="darkgray" />
 
-        <div className="w-1/3">
-          <Tabs defaultValue="leaderboard" color="blue">
-            <Tabs.List grow>
-              <Tabs.Tab value="leaderboard" className="hover:bg-slate-800">
-                Leaderboard
-              </Tabs.Tab>
-              <Tabs.Tab value="tree" className="hover:bg-slate-800">
-                Tree
-              </Tabs.Tab>
-            </Tabs.List>
+          <div className="w-1/3">
+            <Tabs defaultValue="leaderboard" color="blue">
+              <Tabs.List grow>
+                <Tabs.Tab value="leaderboard" className="hover:bg-slate-800">
+                  Leaderboard
+                </Tabs.Tab>
+                <Tabs.Tab value="tree" className="hover:bg-slate-800">
+                  Tree
+                </Tabs.Tab>
+              </Tabs.List>
 
-            <Tabs.Panel value="leaderboard">
-              <Leaderboard username={user?.username} />
-            </Tabs.Panel>
-            <Tabs.Panel value="tree">
-              <div className="pt-4">
-                <Bonsai />
-              </div>
-            </Tabs.Panel>
-          </Tabs>
+              <Tabs.Panel value="leaderboard">
+                <Leaderboard username={user?.username} />
+              </Tabs.Panel>
+              <Tabs.Panel value="tree">
+                <div className="pt-4">
+                  <Bonsai />
+                </div>
+              </Tabs.Panel>
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import Practice from "@/components/practice";
 
 export default function BeginnerPractice() {
-  return <Practice backendUrl="/api/hello" startBalance={10000} target={500} />;
+  return <Practice backendUrl="/api/hello" startBalance={1000} target={1000} />;
 }

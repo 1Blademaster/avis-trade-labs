@@ -1,17 +1,23 @@
 import { Table } from '@mantine/core'
+import { useInterval } from '@mantine/hooks'
 import { useEffect, useState } from 'react'
 
 export default function Leaderboard({ username }) {
   const [leaderboardData, setLeaderboardData] = useState([])
 
+  const getLeaderboardData = async () => {
+    let res = await fetch('/api/leaderboard/get')
+    let tempLeaderboard = await res.json()
+    setLeaderboardData(tempLeaderboard)
+  }
+
   useEffect(() => {
-    const getLeaderboardData = async () => {
-      let res = await fetch('/api/leaderboard/get')
-      let tempLeaderboard = await res.json()
-      setLeaderboardData(tempLeaderboard)
-    }
     getLeaderboardData()
   }, [])
+
+  useInterval(() => {
+    getLeaderboardData();
+  }, 100, {autoInvoke: true})
 
   function formatProfit(profit) {
     return profit
@@ -30,6 +36,7 @@ export default function Leaderboard({ username }) {
           <Table.Th>Place</Table.Th>
           <Table.Th>Username</Table.Th>
           <Table.Th>Total Profit</Table.Th>
+          <Table.Th>Last Trade</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -60,6 +67,7 @@ export default function Leaderboard({ username }) {
               <Table.Td>{idx + 1}</Table.Td>
               <Table.Td>{user.username}</Table.Td>
               <Table.Td>{formatProfit(user.profit)}</Table.Td>
+              <Table.Td>{user.last_trade ? formatProfit(user.last_trade.profit) : ''}</Table.Td>
             </Table.Tr>
           )
         })}
