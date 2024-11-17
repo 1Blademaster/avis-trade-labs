@@ -406,40 +406,66 @@ export default function Practice({ backendUrl, startBalance, target }) {
               <RealtimeGraph ref={ref} datasetLabel={"BTC"} />
             </div>
             <div className="flex flex-row space-x-8">
-              <div className="flex flex-col space-y-4 w-52">
+              <div className="flex flex-col space-y-4">
                 <Paper shadow="xs" p="sm" className="bg-slate-800">
                   <p className="mb-2">Buy Amount</p>
-                  <NumberInput
-                    prefix="$"
-                    value={buyPrice}
-                    onChange={setBuyPrice}
-                    allowNegative={false}
-                    min={1}
-                    hideControls
-                    className="mb-2"
-                  />
-                  <ButtonGroup className="w-full">
-                    <Button
-                      variant="filled"
-                      color="#2ae841"
-                      className="w-full"
-                      onClick={buyIn}
-                      disabled={currentBal < buyPrice || boughtIn}
-                      autoContrast
+                  <div className="flex flex-row space-x-4">
+                    <div className="flex flex-col w-3/5 space-y-2">
+                      <NumberInput
+                        prefix="$"
+                        value={buyPrice.toFixed(2)}
+                        onChange={setBuyPrice}
+                        allowNegative={false}
+                        min={1}
+                        hideControls
+                      />
+                      <ButtonGroup>
+                        <Button
+                          variant="filled"
+                          className="w-full"
+                          onClick={() => setBuyPrice(currentBal / 2)}
+                          autoContrast
+                          size="compact-sm"
+                        >
+                          1/2
+                        </Button>
+                        <Button
+                          variant="filled"
+                          className="w-full"
+                          onClick={() => setBuyPrice(currentBal)}
+                          autoContrast
+                          size="compact-sm"
+                        >
+                          MAX
+                        </Button>
+                      </ButtonGroup>
+                    </div>
+                    <ButtonGroup
+                      className="justify-between w-1/2"
+                      orientation="vertical"
                     >
-                      BUY
-                    </Button>
-                    <Button
-                      variant="filled"
-                      color={tailwindColors.red[500]}
-                      className="w-full"
-                      onClick={sellOut}
-                      disabled={!boughtIn}
-                      autoContrast
-                    >
-                      SELL
-                    </Button>
-                  </ButtonGroup>
+                      <Button
+                        variant="filled"
+                        color="#2ae841"
+                        className="w-full"
+                        onClick={buyIn}
+                        disabled={currentBal < buyPrice || boughtIn}
+                        autoContrast
+                      >
+                        BUY
+                      </Button>
+                      <Button
+                        variant="filled"
+                        color={tailwindColors.red[500]}
+                        className="w-full"
+                        onClick={sellOut}
+                        disabled={!boughtIn}
+                        autoContrast
+                      >
+                        SELL
+                      </Button>
+                    </ButtonGroup>
+                  </div>
                 </Paper>
 
                 <Paper shadow="xs" p="sm" className="bg-slate-800">
