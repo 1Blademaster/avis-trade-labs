@@ -3,17 +3,18 @@ import RealtimeGraph from '@/components/realtimeGraph'
 import {
   Button,
   ButtonGroup,
+  Checkbox,
   Divider,
   NumberInput,
+  Paper,
   ScrollArea,
   Table,
+  Tooltip,
 } from '@mantine/core'
 import { useInterval, useListState } from '@mantine/hooks'
+import { useEffect, useRef, useState } from 'react'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../tailwind.config.js'
-import { Fragment, useEffect, useRef, useState } from 'react'
-import { Checkbox } from '@mantine/core'
-
 
 const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
@@ -47,15 +48,17 @@ export default function Home() {
 
       const lastTransaction = transactionHistory[0]
       if (
-        boughtIn && stopLossEnabled &&
+        boughtIn &&
+        stopLossEnabled &&
         stopLoss / 100 <=
           (lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
         sellOut()
-      } 
+      }
       if (
-        boughtIn && takeProfitEnabled &&
+        boughtIn &&
+        takeProfitEnabled &&
         takeProfit / 100 <=
           -(lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
@@ -161,7 +164,7 @@ export default function Home() {
     ref?.current.config.options.plugins.annotation.annotations.pop()
     ref?.current.config.options.plugins.annotation.annotations.push(line)
     ref?.current.update('quiet')
-    
+
     setCurrentBal(newBal)
   }
 
@@ -174,62 +177,84 @@ export default function Home() {
           </div>
           <div className='flex flex-row space-x-8'>
             <div className='flex flex-col space-y-4 w-52'>
-              <NumberInput
-                prefix='$'
-                value={buyPrice}
-                onChange={setBuyPrice}
-                allowNegative={false}
-                min={1}
-                hideControls
-              />
-              <ButtonGroup className='w-full'>
-                <Button
-                  variant='filled'
-                  color='#a3e635'
-                  className='w-full'
-                  onClick={buyIn}
-                  disabled={currentBal < buyPrice || boughtIn}
-                >
-                  BUY
-                </Button>
-                <Button
-                  variant='filled'
-                  color={tailwindColors.red[500]}
-                  className='w-full'
-                  onClick={sellOut}
-                  disabled={!boughtIn}
-                >
-                  SELL
-                </Button>
-              </ButtonGroup>
-              <NumberInput
-                suffix='%'
-                value={stopLoss}
-                onChange={setStopLoss}
-                disabled={!stopLossEnabled}
-                allowNegative={false}
-                hideControls
-              />
-              <Checkbox
-                label="Stop Loss"
-                color='#a3e635'
-                checked={stopLossEnabled}
-                onChange={(e) => setStopLossEnabled(e.currentTarget.checked)}
-              />
-              <NumberInput
-                suffix='%'
-                value={takeProfit}
-                onChange={setTakeProfit}
-                allowNegative={false}
-                disabled={!takeProfitEnabled}
-                hideControls
-              />    
-              <Checkbox
-                label="Take Profit"
-                color="lime"
-                checked={takeProfitEnabled}
-                onChange={(e) => setTakeProfitEnabled(e.currentTarget.checked)}
-              />
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Buy Amount</p>
+                <NumberInput
+                  prefix='$'
+                  value={buyPrice}
+                  onChange={setBuyPrice}
+                  allowNegative={false}
+                  min={1}
+                  hideControls
+                  className='mb-2'
+                />
+                <ButtonGroup className='w-full'>
+                  <Button
+                    variant='filled'
+                    color='#a3e635'
+                    className='w-full'
+                    onClick={buyIn}
+                    disabled={currentBal < buyPrice || boughtIn}
+                  >
+                    BUY
+                  </Button>
+                  <Button
+                    variant='filled'
+                    color={tailwindColors.red[500]}
+                    className='w-full'
+                    onClick={sellOut}
+                    disabled={!boughtIn}
+                  >
+                    SELL
+                  </Button>
+                </ButtonGroup>
+              </Paper>
+
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Take Profit</p>
+                <div className='flex flex-row space-x-2 items-center'>
+                  <Tooltip label='Take Profit'>
+                    <Checkbox
+                      color='lime'
+                      checked={takeProfitEnabled}
+                      onChange={(e) =>
+                        setTakeProfitEnabled(e.currentTarget.checked)
+                      }
+                    />
+                  </Tooltip>
+                  <NumberInput
+                    suffix='%'
+                    value={takeProfit}
+                    onChange={setTakeProfit}
+                    allowNegative={false}
+                    disabled={!takeProfitEnabled}
+                    hideControls
+                  />
+                </div>
+              </Paper>
+
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Stop Loss</p>
+                <div className='flex flex-row space-x-2 items-center'>
+                  <Tooltip label='Stop Loss'>
+                    <Checkbox
+                      color='#a3e635'
+                      checked={stopLossEnabled}
+                      onChange={(e) =>
+                        setStopLossEnabled(e.currentTarget.checked)
+                      }
+                    />
+                  </Tooltip>
+                  <NumberInput
+                    suffix='%'
+                    value={stopLoss}
+                    onChange={setStopLoss}
+                    disabled={!stopLossEnabled}
+                    allowNegative={false}
+                    hideControls
+                  />
+                </div>
+              </Paper>
             </div>
             <p className='font-bold text-3xl'>
               Balance: ${currentBal.toFixed(2)}
