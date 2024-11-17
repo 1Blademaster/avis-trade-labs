@@ -393,7 +393,9 @@ export default function Home() {
               <Leaderboard />
             </Tabs.Panel>
             <Tabs.Panel value="tree">
-              <Bonsai />
+              <div className="pt-4">
+                <Bonsai />
+              </div>
             </Tabs.Panel>
           </Tabs>
         </div> 
