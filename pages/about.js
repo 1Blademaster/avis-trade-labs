@@ -39,6 +39,7 @@ export default function About() {
       <div className='mx-auto w-full flex flex-row space-x-8 justify-center'>
         {githubs.map((github) => (
           <Paper
+            key={github.github}
             shadow='xs'
             p='sm'
             className='bg-slate-800 w-40 flex flex-col items-center justify-center space-y-8 hover:text-lime-400 transition-colors duration-300'
