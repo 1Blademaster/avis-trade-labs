@@ -12,7 +12,7 @@ const maxDataLength = 4_500_000
 const fileNames = [path.join(process.cwd(), 'public/combed.csv')]
 
 function loopThroughFiles(currentFileIndex) {
-  console.log(__dirname, process.cwd(), path.join(process.cwd(), 'combed.csv'))
+  console.log('start file parsing')
   fs.createReadStream(fileNames[currentFileIndex])
     .pipe(csv.parse({ headers: true }))
     .on('error', (error) => console.error(error))
