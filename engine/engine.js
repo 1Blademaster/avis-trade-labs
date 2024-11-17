@@ -1,8 +1,8 @@
 const fs = require('fs')
 const csv = require('fast-csv')
 
-const varianceMultiplier = 50
-const valueOffset = -(427500 / 20)
+const varianceMultiplier = 25
+const valueOffset = -(427500 / 100)
 
 global.data = []
 const maxDataLength = 4_500_000
@@ -56,6 +56,6 @@ if (global.current === 0) {
       data[current]?.Close * varianceMultiplier + valueOffset
     )
     btcData.time = parseInt(data[current]?.Timestamp)
-    console.log(current, global.data.length)
-  }, 100)
+    console.log(current, btcData)
+  }, 10)
 }

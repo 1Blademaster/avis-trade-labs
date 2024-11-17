@@ -56,6 +56,8 @@ export default function Home() {
       ref?.current.data.datasets[0].data.push(data)
       ref?.current.update('quiet')
       
+      console.log(btcData.close)
+
       const lastTransaction = transactionHistory[0]
 
       if (
