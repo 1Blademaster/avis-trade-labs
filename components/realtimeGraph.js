@@ -69,8 +69,8 @@ const RealtimeGraph = forwardRef(function RealtimeGraph({ datasetLabel }, ref) {
     datasets: [
       {
         label: datasetLabel,
-        borderColor: 'white',
-        backgroundColor: 'white',
+        borderColor: '#fafafa',
+        backgroundColor: '#fafafa',
         data: [],
       },
     ],
@@ -84,7 +84,7 @@ const RealtimeGraph = forwardRef(function RealtimeGraph({ datasetLabel }, ref) {
   }, [datasetLabel])
 
   return (
-    <div className='p-8 rounded-lg w-full h-full'>
+    <div className='rounded-lg w-full h-full'>
       <Scatter ref={ref} options={options} data={chartData} />
     </div>
   )

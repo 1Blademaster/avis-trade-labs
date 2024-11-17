@@ -1,6 +1,8 @@
-import Bonsai from "@/components/bonsai.js";
-import Leaderboard from "@/components/leaderboard";
-import RealtimeGraph from "@/components/realtimeGraph";
+import Bonsai from '@/components/bonsai.js'
+import Leaderboard from '@/components/leaderboard'
+import RealtimeGraph from '@/components/realtimeGraph'
+
+import { useUser } from '@auth0/nextjs-auth0/client'
 import {
   Button,
   ButtonGroup,
@@ -8,106 +10,127 @@ import {
   Divider,
   Modal,
   NumberInput,
-  Paper,
   ScrollArea,
   Stack,
   Table,
-  Tooltip,
 } from '@mantine/core'
 import { useDisclosure, useInterval, useListState } from '@mantine/hooks'
+import Link from 'next/link.js'
 import { useEffect, useRef, useState } from 'react'
 import resolveConfig from 'tailwindcss/resolveConfig'
 import tailwindConfig from '../tailwind.config.js'
-import { useUser } from '@auth0/nextjs-auth0/client'
-import Link from 'next/link.js'
 
-const tailwindColors = resolveConfig(tailwindConfig).theme.colors;
+const tailwindColors = resolveConfig(tailwindConfig).theme.colors
 
 export default function Home() {
-  const ref = useRef(null);
-  const scrollareaViewportRef = useRef(null);
+  const ref = useRef(null)
+  const scrollareaViewportRef = useRef(null)
 
-  const [currentBtcData, setCurrentBtcData] = useState(null);
+  const [currentBtcData, setCurrentBtcData] = useState(null)
 
-  const [buyPrice, setBuyPrice] = useState(100);
-  const [currentBal, setCurrentBal] = useState(1000);
-  const [boughtIn, setBoughtIn] = useState(false);
-  const [stopLossEnabled, setStopLossEnabled] = useState(false);
-  const [takeProfitEnabled, setTakeProfitEnabled] = useState(false);
-  const [stopLoss, setStopLoss] = useState(20);
-  const [takeProfit, setTakeProfit] = useState(20);
+  const [buyPrice, setBuyPrice] = useState(100)
+  const [currentBal, setCurrentBal] = useState(1000)
+  const [boughtIn, setBoughtIn] = useState(false)
+  const [stopLossEnabled, setStopLossEnabled] = useState(false)
+  const [takeProfitEnabled, setTakeProfitEnabled] = useState(false)
+  const [stopLoss, setStopLoss] = useState(20)
+  const [takeProfit, setTakeProfit] = useState(20)
 
-  const REQUIRE_LOGIN = false;
-  const {user, error, isLoading} = useUser();
-  const [opened, {open, close}] = useDisclosure(REQUIRE_LOGIN && !user);
+  const REQUIRE_LOGIN = false
+  const { user, error, isLoading } = useUser()
+  const [opened, { open, close }] = useDisclosure(REQUIRE_LOGIN && !user)
 
   const [transactionHistory, transactionHistoryHandler] = useListState([])
 
   const interval = useInterval(() => {
     async function fetchPosts() {
-      let res = await fetch("/api/hello");
-      let btcData = await res.json();
-      if (btcData.time === null) return;
+      let res = await fetch('/api/hello')
+      let btcData = await res.json()
+      if (btcData.time === null) return
 
-      setCurrentBtcData(btcData);
+      setCurrentBtcData(btcData)
 
-      const data = { x: Date.now(), y: btcData.close };
-      ref?.current.data.datasets[0].data.push(data);
-      ref?.current.update("quiet");
+      const data = { x: Date.now(), y: btcData.close }
+      ref?.current.data.datasets[0].data.push(data)
+      ref?.current.update('quiet')
 
-      const lastTransaction = transactionHistory[0];
+      const lastTransaction = transactionHistory[0]
       if (
         boughtIn &&
-        stopLossEnabled &&
         stopLoss / 100 <=
           (lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
-        sellOut();
-      }
-      if (
+        sellOut()
+      } else if (
         boughtIn &&
-        takeProfitEnabled &&
-        takeProfit / 100 <=
+        stopLoss / 100 <=
           -(lastTransaction.btcPrice - currentBtcData.close) /
             lastTransaction.btcPrice
       ) {
-        sellOut();
+        sellOut()
       }
     }
-    fetchPosts();
-  }, 100);
+    fetchPosts()
+  }, 100)
 
   useEffect(() => {
     // interval.start();
-    return interval.stop;
-  }, []);
+    return interval.stop
+  }, [])
 
   useEffect(() => {
-    scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  }, [transactionHistory]);
+    scrollareaViewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [transactionHistory])
+
+  useEffect(() => {
+    const balanceLabel = {
+      type: 'label',
+      yValue: (context) => context.chart.scales.y.max,
+      xValue: 'center',
+      position: {
+        // x: 'end',
+        y: 'start',
+      },
+      padding: '10',
+      // backgroundColor: tailwindColors.slate[100],
+      content: [`Balance: $${currentBal.toFixed(2)}`],
+      color: tailwindColors.slate[100],
+      font: {
+        size: 28,
+        weight: 'bold',
+      },
+      borderRadius: 5,
+    }
+
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(
+      balanceLabel
+    )
+    ref?.current.update('quiet')
+  }, [currentBal])
 
   function buyIn() {
-    if (currentBtcData === null) return;
+    if (currentBtcData === null) return
 
-    setBoughtIn(true);
+    setBoughtIn(true)
 
-    const currentBtcClose = currentBtcData.close;
+    const currentBtcClose = currentBtcData.close
 
     const transaction = {
       id: crypto.randomUUID(),
-      type: "buy",
+      type: 'buy',
       btcPrice: currentBtcClose,
       buyPrice: buyPrice,
       time: new Date(),
-    };
+    }
 
-    transactionHistoryHandler.prepend(transaction);
+    transactionHistoryHandler.prepend(transaction)
 
     const line = {
-      drawTime: "afterDatasetsDraw",
-      type: "line",
-      scaleID: "y",
+      drawTime: 'afterDatasetsDraw',
+      type: 'line',
+      scaleID: 'y',
       value: currentBtcClose,
       borderColor: tailwindColors.lime[500],
       borderWidth: 2,
@@ -115,48 +138,48 @@ export default function Home() {
         backgroundColor: tailwindColors.lime[500],
         content: `BUY: $${currentBtcClose}`,
         display: true,
-        position: "start",
+        position: 'start',
       },
-    };
+    }
 
-    ref?.current.config.options.plugins.annotation.annotations.pop();
-    ref?.current.config.options.plugins.annotation.annotations.push(line);
-    ref?.current.update("quiet");
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
 
-    setCurrentBal(currentBal - buyPrice);
-    setBuyPrice(100);
+    setCurrentBal(currentBal - buyPrice)
+    setBuyPrice(100)
   }
 
   function sellOut() {
-    if (!boughtIn) return;
+    if (!boughtIn) return
 
-    setBoughtIn(false);
+    setBoughtIn(false)
 
-    const lastTransaction = transactionHistory[0];
+    const lastTransaction = transactionHistory[0]
 
-    const currentBtcClose = currentBtcData.close;
+    const currentBtcClose = currentBtcData.close
 
     const newBal =
       currentBal +
-      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice);
+      currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice)
 
     const profit =
       currentBtcClose * (lastTransaction.buyPrice / lastTransaction.btcPrice) -
-      lastTransaction.buyPrice;
+      lastTransaction.buyPrice
 
     const transaction = {
       id: crypto.randomUUID(),
-      type: "sell",
+      type: 'sell',
       btcPrice: currentBtcClose,
       buyPrice: lastTransaction.buyPrice,
       profit: profit,
       time: new Date(),
-    };
+    }
 
     const line = {
-      drawTime: "afterDatasetsDraw",
-      type: "line",
-      scaleID: "y",
+      drawTime: 'afterDatasetsDraw',
+      type: 'line',
+      scaleID: 'y',
       value: currentBtcClose,
       borderColor: tailwindColors.red[500],
       borderWidth: 2,
@@ -164,32 +187,32 @@ export default function Home() {
         backgroundColor: tailwindColors.red[500],
         content: `SELL: $${currentBtcClose}`,
         display: true,
-        position: "start",
+        position: 'start',
       },
-    };
+    }
 
-    transactionHistoryHandler.prepend(transaction);
+    transactionHistoryHandler.prepend(transaction)
 
-    ref?.current.config.options.plugins.annotation.annotations.pop();
-    ref?.current.config.options.plugins.annotation.annotations.push(line);
-    ref?.current.update("quiet");
+    ref?.current.config.options.plugins.annotation.annotations.pop()
+    ref?.current.config.options.plugins.annotation.annotations.push(line)
+    ref?.current.update('quiet')
 
-    setCurrentBal(newBal);
+    setCurrentBal(newBal)
   }
 
   return (
     <div className='flex p-4'>
       <div className='flex flex-row w-full space-x-4'>
         <div className='flex flex-col w-full space-y-8'>
-        <Modal 
-            opened={opened} 
+          <Modal
+            opened={opened}
             overlayProps={{
-                backgroundOpacity: 0.3,
-                blur: 3
+              backgroundOpacity: 0.3,
+              blur: 3,
             }}
             styles={{
-                header: {backgroundColor: '#2d2d2d'},
-                content: {backgroundColor: '#2d2d2d'}
+              header: { backgroundColor: '#2d2d2d' },
+              content: { backgroundColor: '#2d2d2d' },
             }}
             centered
             onClose={user ? close : () => {}}
@@ -197,7 +220,7 @@ export default function Home() {
           >
             <Stack align='center'>
               You must be logged to play.
-              <Button component={Link} href='/api/auth/login' w={"33%"}>
+              <Button component={Link} href='/api/auth/login' w={'33%'}>
                 Login
               </Button>
             </Stack>
@@ -205,33 +228,33 @@ export default function Home() {
           <div className='h-3/4'>
             <RealtimeGraph ref={ref} datasetLabel={'BTC'} />
           </div>
-          <div className="flex flex-row space-x-8">
-            <div className="flex flex-col space-y-4 w-52">
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Buy Amount</p>
+          <div className='flex flex-row space-x-8'>
+            <div className='flex flex-col space-y-4 w-52'>
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Buy Amount</p>
                 <NumberInput
-                  prefix="$"
+                  prefix='$'
                   value={buyPrice}
                   onChange={setBuyPrice}
                   allowNegative={false}
                   min={1}
                   hideControls
-                  className="mb-2"
+                  className='mb-2'
                 />
-                <ButtonGroup className="w-full">
+                <ButtonGroup className='w-full'>
                   <Button
-                    variant="filled"
-                    color="#a3e635"
-                    className="w-full"
+                    variant='filled'
+                    color='#a3e635'
+                    className='w-full'
                     onClick={buyIn}
                     disabled={currentBal < buyPrice || boughtIn}
                   >
                     BUY
                   </Button>
                   <Button
-                    variant="filled"
+                    variant='filled'
                     color={tailwindColors.red[500]}
-                    className="w-full"
+                    className='w-full'
                     onClick={sellOut}
                     disabled={!boughtIn}
                   >
@@ -240,12 +263,12 @@ export default function Home() {
                 </ButtonGroup>
               </Paper>
 
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Take Profit</p>
-                <div className="flex flex-row items-center space-x-2">
-                  <Tooltip label="Take Profit">
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Take Profit</p>
+                <div className='flex flex-row items-center space-x-2'>
+                  <Tooltip label='Take Profit'>
                     <Checkbox
-                      color="lime"
+                      color='lime'
                       checked={takeProfitEnabled}
                       onChange={(e) =>
                         setTakeProfitEnabled(e.currentTarget.checked)
@@ -253,7 +276,7 @@ export default function Home() {
                     />
                   </Tooltip>
                   <NumberInput
-                    suffix="%"
+                    suffix='%'
                     value={takeProfit}
                     onChange={setTakeProfit}
                     allowNegative={false}
@@ -263,12 +286,12 @@ export default function Home() {
                 </div>
               </Paper>
 
-              <Paper shadow="xs" p="sm" className="bg-slate-800">
-                <p className="mb-2">Stop Loss</p>
-                <div className="flex flex-row items-center space-x-2">
-                  <Tooltip label="Stop Loss">
+              <Paper shadow='xs' p='sm' className='bg-slate-800'>
+                <p className='mb-2'>Stop Loss</p>
+                <div className='flex flex-row items-center space-x-2'>
+                  <Tooltip label='Stop Loss'>
                     <Checkbox
-                      color="#a3e635"
+                      color='#a3e635'
                       checked={stopLossEnabled}
                       onChange={(e) =>
                         setStopLossEnabled(e.currentTarget.checked)
@@ -276,7 +299,7 @@ export default function Home() {
                     />
                   </Tooltip>
                   <NumberInput
-                    suffix="%"
+                    suffix='%'
                     value={stopLoss}
                     onChange={setStopLoss}
                     disabled={!stopLossEnabled}
@@ -291,8 +314,8 @@ export default function Home() {
               <Bonsai></Bonsai>
             </div>
 
-            <div className="flex flex-col gap-y-4 !ml-auto w-11/12">
-              <p className="text-3xl font-bold">
+            <div className='flex flex-col gap-y-4 !ml-auto w-11/12'>
+              <p className='text-3xl font-bold'>
                 Balance: ${currentBal.toFixed(2)}
               </p>
               <ScrollArea h={200} viewportRef={scrollareaViewportRef}>
@@ -308,11 +331,11 @@ export default function Home() {
                   </Table.Thead>
                   <Table.Tbody>
                     {transactionHistory.map((transaction) => {
-                      if (transaction.type === "buy") {
+                      if (transaction.type === 'buy') {
                         return (
                           <Table.Tr
                             key={transaction.id}
-                            className="bg-[#2ae841]"
+                            className='bg-[#2ae841]'
                           >
                             <Table.Td>
                               {new Date(transaction.time).toLocaleTimeString()}
@@ -326,12 +349,12 @@ export default function Home() {
                             </Table.Td>
                             <Table.Td></Table.Td>
                           </Table.Tr>
-                        );
+                        )
                       } else {
                         return (
                           <Table.Tr
                             key={transaction.id}
-                            className="bg-red-300/50"
+                            className='bg-red-300/50'
                           >
                             <Table.Td>
                               {new Date(transaction.time).toLocaleTimeString()}
@@ -347,7 +370,7 @@ export default function Home() {
                               ${transaction.profit.toFixed(2)}
                             </Table.Td>
                           </Table.Tr>
-                        );
+                        )
                       }
                     })}
                   </Table.Tbody>
@@ -356,11 +379,11 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <Divider orientation="vertical" color="darkgray" />
-        <div className="w-1/3">
+        <Divider orientation='vertical' color='darkgray' />
+        <div className='w-1/3'>
           <Leaderboard />
         </div>
       </div>
     </div>
-  );
+  )
 }
