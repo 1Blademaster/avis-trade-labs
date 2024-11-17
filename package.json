@@ -13,6 +13,7 @@
     "@mantine/core": "^7.14.0",
     "@mantine/hooks": "^7.14.0",
     "@robloche/chartjs-plugin-streaming": "^3.1.0",
+    "@tabler/icons-react": "^3.22.0",
     "chart.js": "^4.4.6",
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-annotation": "^2.2.1",
