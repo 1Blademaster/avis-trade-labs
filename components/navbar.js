@@ -40,21 +40,23 @@ export default function Navbar() {
         <Link href='/'>Play</Link>
         <Link href='/practice'>Practice</Link>
         <Link href='/about'>About</Link>
-        <Menu>
-          <Menu.Target>
-            <UnstyledButton>
-              <Group justify='space-around'>
-                { isLoading ? "Loading" : (userData ? userData.username : "Log In")}
-                <IconChevronDown size="1rem"/>
-              </Group>
-            </UnstyledButton>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item component={Link} href="/api/auth/logout">
-              Sign Out
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+        { !isLoading && !user ? <Link href="/api/auth/login">Log In</Link> :
+          <Menu>
+            <Menu.Target>
+              <UnstyledButton>
+                <Group justify='space-around'>
+                  { isLoading ? "Loading" : (userData ? userData.username : "Log In")}
+                  <IconChevronDown size="1rem"/>
+                </Group>
+              </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item component={Link} href="/api/auth/logout">
+                Sign Out
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        }
       </div>
     </div>
   );
