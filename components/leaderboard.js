@@ -42,6 +42,10 @@ export default function Leaderboard() {
     getLeaderboardData();
   }, [])
 
+  function formatProfit(profit){
+    return profit ? (profit < 0 ? "-£" + Math.abs(profit) : "£" + profit) : "";
+  }
+
   const rowsDisplayed = 20;
 
   return (
@@ -69,7 +73,7 @@ export default function Leaderboard() {
             <Table.Tr key={`tr${idx}`} className={podiumClassName}>
               <Table.Td key={`idx${idx}`}>{idx + 1}</Table.Td>
               <Table.Td key={`username${idx}`}>{user.username}</Table.Td>
-              <Table.Td key={`profit${idx}`}>{user.profit}</Table.Td>
+              <Table.Td key={`profit${idx}`}>{formatProfit(user.profit)}</Table.Td>
             </Table.Tr>
           )
         })}
