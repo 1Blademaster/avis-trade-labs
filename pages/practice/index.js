@@ -21,7 +21,7 @@ export default function Practice() {
       color: "orange",
       badge: "Intermediate",
       description:
-        "An intermediate practice mode based of BTC from 2014-2024. Time moves at 5 seconds per day and a starting balance of $500.",
+        "An intermediate practice mode based of BTC from 2014-2024. Time moves at 5 seconds per day and a starting balance of $1000.",
       link: "/practice/intermediate",
       target: 1000,
     },

@@ -26,7 +26,7 @@ import tailwindConfig from "../tailwind.config.js";
 
 const tailwindColors = resolveConfig(tailwindConfig).theme.colors;
 
-export default function Practice({ backendUrl, balance }) {
+export default function Practice({ backendUrl, startBalance, target }) {
   const ref = useRef(null);
   const scrollareaViewportRef = useRef(null);
 
@@ -35,13 +35,15 @@ export default function Practice({ backendUrl, balance }) {
   const [currentBtcData, setCurrentBtcData] = useState(null);
 
   const [buyPrice, setBuyPrice] = useState(1000);
-  const [currentBal, setCurrentBal] = useState(balance);
+  const [currentBal, setCurrentBal] = useState(startBalance);
   const [boughtIn, setBoughtIn] = useState(false);
   const [stopLossEnabled, setStopLossEnabled] = useState(false);
   const [takeProfitEnabled, setTakeProfitEnabled] = useState(false);
   const [showLoginOverlay, setLoginOverlay] = useState(false);
   const [stopLoss, setStopLoss] = useState(20);
   const [takeProfit, setTakeProfit] = useState(20);
+  const [won, setWon] = useState(false);
+  const [lost, setLost] = useState(false);
 
   const REQUIRE_LOGIN = false;
   const { user, error, isLoading } = useUser();
@@ -84,7 +86,9 @@ export default function Practice({ backendUrl, balance }) {
         }
       }
 
-      fetchPosts();
+      if (!won && !lost) {
+        fetchPosts();
+      }
     },
     100,
     { autoInvoke: true }
@@ -287,6 +291,14 @@ export default function Practice({ backendUrl, balance }) {
     ref?.current.update("quiet");
 
     setCurrentBal(newBal);
+
+    if (newBal >= startBalance + target) {
+      console.log("User has won");
+      setWon(true);
+    } else if (newBal <= 0) {
+      console.log("User has lost");
+      setLost(true);
+    }
   }
 
   return (
@@ -306,6 +318,44 @@ export default function Practice({ backendUrl, balance }) {
           </div>
         </div>
       </Overlay>
+
+      <Overlay color="#000" backgroundOpacity={0.35} blur={15} hidden={!won}>
+        <div className="flex flex-col items-center justify-center w-1/3 h-full mx-auto space-y-4 text-center">
+          <p>
+            Congrats! You've beaten this practice with a balance of $
+            {Math.round(currentBal, 2)}.
+          </p>
+          <div className="flex flex-row items-center gap-x-4">
+            <Button
+              onClick={() => {
+                window.location.href = "/practice";
+              }}
+              className="text-xl"
+            >
+              Back to Practice
+            </Button>
+          </div>
+        </div>
+      </Overlay>
+
+      <Overlay color="#000" backgroundOpacity={0.35} blur={15} hidden={!lost}>
+        <div className="flex flex-col items-center justify-center w-1/3 h-full mx-auto space-y-4 text-center">
+          <p>
+            Oops! You've gone bust... maybe go back to practice to try again?
+          </p>
+          <div className="flex flex-row items-center gap-x-4">
+            <Button
+              onClick={() => {
+                window.location.href = "/practice";
+              }}
+              className="text-xl"
+            >
+              Back to Practice
+            </Button>
+          </div>
+        </div>
+      </Overlay>
+
       <div className="flex h-screen p-4">
         <div className="flex flex-row w-full space-x-4">
           <div className="relative flex flex-col w-full space-y-8">
