@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { useUser } from '@auth0/nextjs-auth0/client'
 
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { fetchLeaderboardScores } from './lib/data'
 
 function BuyTransactionRow({ transaction }) {
   return (
@@ -65,7 +64,6 @@ export default function Home() {
     }, 100)
 
     const loadScoreboardData = async () => {
-        score = await fetchLeaderboardScores(1);
         console.log("Score: " +  score)
     }
     
